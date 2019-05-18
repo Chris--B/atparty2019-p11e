@@ -1,8 +1,8 @@
-///! Rust Runtime Defines
-///!
-///! Defines to satisfy Rust runtime linkage. These are only necessary when
-///! building with #![no_std].
-
+//! Rust Runtime Defines
+//!
+//! Defines to satisfy Rust runtime linkage. These are only necessary
+//! when building with #![no_std].
+//!
 use core;
 
 #[panic_handler]
