@@ -1,0 +1,32 @@
+[package]
+name = "p11e"
+version = "0.1.0"
+authors = ["Chris Butler <chris.butler@amd.com>"]
+edition = "2018"
+
+## Build Configurations
+#
+[features]
+default = ["enable_logging"]
+# default = []
+
+# Enable print!() and println!() log to console and msvc debugger.
+#   When disabled, they are no-ops (and do not evaluate their arguments!)
+#   Enabling this significantly increases binary size.
+enable_logging = []
+
+## Dependencies
+#
+[dependencies]
+libc = "0.2.54"
+cfg-if = "0.1"
+
+[target.'cfg(windows)'.dependencies.winapi]
+version = '0.3'
+features = [
+    "debugapi",
+    "libloaderapi",
+    "processthreadsapi",
+    "winuser",
+    "wingdi",
+]
