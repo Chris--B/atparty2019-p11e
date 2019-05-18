@@ -56,3 +56,11 @@ macro_rules! println {
         }
     };
 }
+
+#[macro_export]
+macro_rules! abort {
+    ($($toks:tt)*) => {
+        println!($($toks)*);
+        panic!("");
+    };
+}

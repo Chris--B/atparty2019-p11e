@@ -46,7 +46,7 @@ impl Window {
         unsafe {
             let res: i32 = gdi::SwapBuffers(self.h_dc);
             if res == 0 {
-                panic!("gdi::SwapBuffers(0x{:x}) failed!", self.h_dc as usize);
+                abort!("gdi::SwapBuffers(0x{:x}) failed!", self.h_dc as usize);
             }
         }
     }
@@ -55,7 +55,7 @@ impl Window {
 #[start]
 fn main(_argc: isize, _argv: *const *const u8) -> isize {
     // Initialize a Window and rendering context
-    let mut window: Window;
+    let window: Window;
     unsafe {
         let h_wnd: windef::HWND;
         let h_dc: windef::HDC;
@@ -77,13 +77,13 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
             ptr::null_mut(),                   // LPVOID    lpPara
         );
         if h_wnd == ptr::null_mut() {
-            panic!("CreateWindowExA failed: {}", GetLastError());
+            abort!("CreateWindowExA failed: {}", GetLastError());
         }
 
         // Get device context handle
         h_dc = user::GetDC(h_wnd);
         if h_dc == ptr::null_mut() {
-            panic!("GetDC failed: {}", GetLastError());
+            abort!("GetDC failed: {}", GetLastError());
         }
 
         let pixel_desc = gdi::PIXELFORMATDESCRIPTOR {
@@ -102,14 +102,15 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         // Get the OpenGL rendering context handle
         h_glrc = gdi::wglCreateContext(h_dc);
         if h_glrc == ptr::null_mut() {
-            panic!("wglCreateContext failed: {}", GetLastError());
+            abort!("wglCreateContext failed: {}", GetLastError());
         }
 
         let res: i32 = gdi::wglMakeCurrent(h_dc, h_glrc);
         if res == 0 {
-            panic!(
+            abort!(
                 "gdi::wglMakeCurrent(0x{:x}, 0x{:x}) failed",
-                h_dc as usize, h_glrc as usize
+                h_dc as usize,
+                h_glrc as usize
             );
         }
         window = Window {
@@ -126,12 +127,13 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         gl = mem::zeroed();
         let res: i32 = ogl::ogl_load(&mut gl);
         if res != 0 {
-            panic!("ogl_load() failed: {}\n{:#?}", res, gl);
+            abort!("ogl_load() failed: {}\n{:#?}", res, gl);
         }
     }
     let gl = gl;
 
     // We're ready to roll.
+    println!("{:#?}", gl);
 
     0
 }
