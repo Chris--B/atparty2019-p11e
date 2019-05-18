@@ -30,3 +30,6 @@ features = [
     "winuser",
     "wingdi",
 ]
+
+[build-dependencies]
+cc = { version = "1.0", features = ["parallel"] }

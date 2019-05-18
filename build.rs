@@ -8,4 +8,9 @@ fn main() {
     } else {
         println!("cargo:rustc-link-lib={}={}", "dylib", "c");
     }
+
+    // Our OpenGL loader is written in C because we're lazy.
+    cc::Build::new()
+        .file("src/ogl_loader.c")
+        .compile("ogl_loader");
 }
