@@ -1,5 +1,6 @@
 
 #include "ogl.h"
+#include <Windows.h>
 
 typedef void (*PFN)(void);
 // Either:
@@ -9,8 +10,13 @@ typedef void (*PFN)(void);
 // Crashes if pError is NULL.
 static PFN load_fn(const char* pName, int* pError)
 {
-    *pError += 1;
-    return NULL;
+    PFN pfn = wglGetProcAddress(pName);
+    if (pfn == NULL) {
+        *pError += 1;
+        return NULL;
+    } else {
+        return pfn;
+    }
 }
 
 int ogl_load(GlFuncs* pFns)
