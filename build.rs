@@ -11,6 +11,7 @@ fn main() {
 
     // Our OpenGL loader is written in C because we're lazy.
     cc::Build::new()
-        .file("src/ogl_loader.c")
+        .file("loader/ogl.c")
+        .include("loader")
         .compile("ogl_loader");
 }

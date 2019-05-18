@@ -24,6 +24,10 @@ mod debug;
 // Rust runtime defines
 mod rt;
 
+// OpenGL Loader
+#[allow(bad_style)]
+mod ogl;
+
 /// Contains platform-specific handles for managing a window and OpenGL context
 #[derive(Debug)]
 pub struct Window {
@@ -48,18 +52,15 @@ impl Window {
     }
 }
 
-extern "C" {
-    fn it_works() -> u32;
-}
-
 #[start]
 fn main(_argc: isize, _argv: *const *const u8) -> isize {
-    // We're in C-API land. What else can we do?
+    // Initialize a Window and rendering context
     let mut window: Window;
     unsafe {
         let h_wnd: windef::HWND;
         let h_dc: windef::HDC;
         let h_glrc: windef::HGLRC;
+
         // Create Window handle
         h_wnd = user::CreateWindowExA(
             0 as _,                            // DWORD     dwExStyle
@@ -119,8 +120,18 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
     }
     println!("Window created! {:#?}", window);
 
-    window.swap_buffers();
+    // Load OpenGL functions
+    let mut gl: ogl::GlFuncs;
+    unsafe {
+        gl = mem::zeroed();
+        let res: i32 = ogl::ogl_load(&mut gl);
+        if res != 0 {
+            panic!("ogl_load() failed: {}\n{:#?}", res, gl);
+        }
+    }
+    let gl = gl;
 
+    // We're ready to roll.
 
     0
 }
