@@ -1,31 +1,41 @@
 
 #include <stdint.h>
 
-typedef float    khronos_float_t;
+// Defined through the preprocessor so that bindgen doesn't seen the khronos_* types.
 
-typedef int8_t   khronos_int8_t;
-typedef int16_t  khronos_int16_t;
-typedef int32_t  khronos_int32_t;
-typedef int64_t  khronos_int64_t;
+#define khronos_float_t     float
 
-typedef uint8_t  khronos_uint8_t;
-typedef uint16_t khronos_uint16_t;
-typedef uint64_t khronos_uint64_t;
+#define khronos_int8_t      int8_t
+#define khronos_int16_t     int16_t
+#define khronos_int32_t     int32_t
+#define khronos_int64_t     int64_t
 
-typedef intptr_t khronos_intptr_t;
-typedef size_t   khronos_size_t;
-typedef size_t   khronos_ssize_t;
+#define khronos_uint8_t     uint8_t
+#define khronos_uint16_t    uint16_t
+#define khronos_uint64_t    uint64_t
+
+#define khronos_intptr_t    intptr_t
+#define khronos_size_t      size_t
+#define khronos_ssize_t     size_t
 
 #include "glad_46.h"
 
 typedef struct GlFuncs {
-    PFNGLCREATEPROGRAMPROC   pfn_glCreateProgram;
-    PFNGLCREATESHADERPROC    pfn_glCreateShader;
-    PFNGLSHADERSOURCEPROC    pfn_glShaderSource;
-    PFNGLCOMPILESHADERPROC   pfn_glCompileShader;
-    PFNGLATTACHSHADERPROC    pfn_glAttachShader;
-    PFNGLLINKPROGRAMPROC     pfn_glLinkProgram;
-    PFNGLUSEPROGRAMPROC      pfn_glUseProgram;
+    // Shaders
+    PFNGLCREATESHADERPROC   pfn_glCreateShader;
+    PFNGLSHADERSOURCEPROC   pfn_glShaderSource;
+    PFNGLCOMPILESHADERPROC  pfn_glCompileShader;
+    PFNGLATTACHSHADERPROC   pfn_glAttachShader;
+
+    // Shader Programs
+    PFNGLCREATEPROGRAMPROC  pfn_glCreateProgram;
+    PFNGLLINKPROGRAMPROC    pfn_glLinkProgram;
+    PFNGLUSEPROGRAMPROC     pfn_glUseProgram;
+
+    // Buffers and Presenting
+    PFNGLCLEARCOLORPROC     pfn_glClearColor;
+    PFNGLCLEARPROC          pfn_glClear;
+    PFNGLCLEARDEPTHPROC     pfn_glClearDepth;
 } GlFuncs;
 
 /// Loads required OpenGL functions into pFns.
