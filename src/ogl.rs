@@ -1,4 +1,3 @@
-
 // Copied over manually because I want the values in hex.
 pub const GL_DEPTH_BUFFER_BIT: u32 = 0x00000100;
 pub const GL_COLOR_BUFFER_BIT: u32 = 0x00004000;
@@ -39,16 +38,16 @@ pub type PFNGLUSEPROGRAMPROC = unsafe extern "C" fn(program: GLuint);
 pub struct GlFuncs {
     /// OpenGL32 module - must outlive the pointers in this struct.
     pub hOpenGL: u64,
-    pub pfn_glCreateShader: PFNGLCREATESHADERPROC,
-    pub pfn_glShaderSource: PFNGLSHADERSOURCEPROC,
-    pub pfn_glCompileShader: PFNGLCOMPILESHADERPROC,
-    pub pfn_glAttachShader: PFNGLATTACHSHADERPROC,
-    pub pfn_glCreateProgram: PFNGLCREATEPROGRAMPROC,
-    pub pfn_glLinkProgram: PFNGLLINKPROGRAMPROC,
-    pub pfn_glUseProgram: PFNGLUSEPROGRAMPROC,
-    pub pfn_glClearColor: PFNGLCLEARCOLORPROC,
-    pub pfn_glClear: PFNGLCLEARPROC,
-    pub pfn_glClearDepth: PFNGLCLEARDEPTHPROC,
+    pub CreateShader: PFNGLCREATESHADERPROC,
+    pub ShaderSource: PFNGLSHADERSOURCEPROC,
+    pub CompileShader: PFNGLCOMPILESHADERPROC,
+    pub AttachShader: PFNGLATTACHSHADERPROC,
+    pub CreateProgram: PFNGLCREATEPROGRAMPROC,
+    pub LinkProgram: PFNGLLINKPROGRAMPROC,
+    pub UseProgram: PFNGLUSEPROGRAMPROC,
+    pub ClearColor: PFNGLCLEARCOLORPROC,
+    pub Clear: PFNGLCLEARPROC,
+    pub ClearDepth: PFNGLCLEARDEPTHPROC,
 }
 extern "C" {
     /// Loads required OpenGL functions into pFns.

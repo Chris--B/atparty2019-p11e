@@ -183,17 +183,20 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         }
     }
     let gl = gl;
-
-    // We're ready to roll.
     println!("{:#?}", gl);
 
-    let mut frame: u32 = 0;
+    // Setup render state
+    unsafe {
+        (gl.ClearColor)(0., 0., 0., 0.);
+    }
 
+    let mut frame: u32 = 0;
     let mut keep_running: bool = true;
     let mut ret_code: isize = 0;
     while keep_running {
         // Win32 boilerplate
         unsafe {
+            // Process all outstanding messages from Windows
             loop {
                 let mut msg: user::MSG = mem::zeroed();
 
@@ -222,18 +225,18 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
             }
         }
 
-        unsafe {
-            if frame % 2 == 0 {
-                (gl.pfn_glClearColor)(1., 0., 1., 1.);
-            } else {
-                (gl.pfn_glClearColor)(0., 1., 0., 1.);
-            }
+        if !keep_running {
+            // The final present will fail if we don't break early.
+            break;
         }
 
         unsafe {
-            (gl.pfn_glClear)(
+            (gl.Clear)(
                 ogl::GL_COLOR_BUFFER_BIT | ogl::GL_DEPTH_BUFFER_BIT,
             );
+
+            // TODO: Render things. Triangles maybe?
+
             // Block until rendering finishes and the swapchain presents (??)
             let res = gdi::SwapBuffers(window.h_dc);
             if res == 0 {

@@ -25,20 +25,20 @@ typedef struct GlFuncs {
     uint64_t                hOpenGL;
 
     // Shaders
-    PFNGLCREATESHADERPROC   pfn_glCreateShader;
-    PFNGLSHADERSOURCEPROC   pfn_glShaderSource;
-    PFNGLCOMPILESHADERPROC  pfn_glCompileShader;
-    PFNGLATTACHSHADERPROC   pfn_glAttachShader;
+    PFNGLCREATESHADERPROC   CreateShader;
+    PFNGLSHADERSOURCEPROC   ShaderSource;
+    PFNGLCOMPILESHADERPROC  CompileShader;
+    PFNGLATTACHSHADERPROC   AttachShader;
 
     // Shader Programs
-    PFNGLCREATEPROGRAMPROC  pfn_glCreateProgram;
-    PFNGLLINKPROGRAMPROC    pfn_glLinkProgram;
-    PFNGLUSEPROGRAMPROC     pfn_glUseProgram;
+    PFNGLCREATEPROGRAMPROC  CreateProgram;
+    PFNGLLINKPROGRAMPROC    LinkProgram;
+    PFNGLUSEPROGRAMPROC     UseProgram;
 
     // Buffers and Presenting
-    PFNGLCLEARCOLORPROC     pfn_glClearColor;
-    PFNGLCLEARPROC          pfn_glClear;
-    PFNGLCLEARDEPTHPROC     pfn_glClearDepth;
+    PFNGLCLEARCOLORPROC     ClearColor;
+    PFNGLCLEARPROC          Clear;
+    PFNGLCLEARDEPTHPROC     ClearDepth;
 } GlFuncs;
 
 /// Loads required OpenGL functions into pFns.

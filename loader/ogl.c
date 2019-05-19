@@ -12,17 +12,18 @@ typedef void (*PFN)(void);
 static PFN load_fn(const char* pName, HMODULE hOpenGL, int* pError)
 {
     PFN pfn = wglGetProcAddress(pName);
+
     if (pfn == NULL) {
         // OpenGL 1.x/2.x functions may not load from wglGetProcAddress,
         // so load them through OpenGL32 directly.
         pfn = GetProcAddress(hOpenGL, pName);
     }
+
     if (pfn == NULL) {
         *pError += 1;
-        return NULL;
-    } else {
-        return pfn;
     }
+
+    return pfn;
 }
 
 int ogl_load(GlFuncs* pFns)
@@ -45,20 +46,20 @@ int ogl_load(GlFuncs* pFns)
     #define LOAD(NAME) load_fn((NAME), pFns->hOpenGL, &error);
 
     // Shaders
-    pFns->pfn_glCreateShader  = (PFNGLCREATESHADERPROC)   LOAD("glCreateShader");
-    pFns->pfn_glShaderSource  = (PFNGLSHADERSOURCEPROC)   LOAD("glShaderSource");
-    pFns->pfn_glCompileShader = (PFNGLCOMPILESHADERPROC)  LOAD("glCompileShader");
-    pFns->pfn_glAttachShader  = (PFNGLATTACHSHADERPROC)   LOAD("glAttachShader");
+    pFns->CreateShader  = (PFNGLCREATESHADERPROC)   LOAD("glCreateShader");
+    pFns->ShaderSource  = (PFNGLSHADERSOURCEPROC)   LOAD("glShaderSource");
+    pFns->CompileShader = (PFNGLCOMPILESHADERPROC)  LOAD("glCompileShader");
+    pFns->AttachShader  = (PFNGLATTACHSHADERPROC)   LOAD("glAttachShader");
 
     // Shader Programs
-    pFns->pfn_glCreateProgram = (PFNGLCREATEPROGRAMPROC)  LOAD("glCreateProgram");
-    pFns->pfn_glLinkProgram   = (PFNGLLINKPROGRAMPROC)    LOAD("glLinkProgram");
-    pFns->pfn_glUseProgram    = (PFNGLUSEPROGRAMPROC)     LOAD("glUseProgram");
+    pFns->CreateProgram = (PFNGLCREATEPROGRAMPROC)  LOAD("glCreateProgram");
+    pFns->LinkProgram   = (PFNGLLINKPROGRAMPROC)    LOAD("glLinkProgram");
+    pFns->UseProgram    = (PFNGLUSEPROGRAMPROC)     LOAD("glUseProgram");
 
     // Buffers and Presenting
-    pFns->pfn_glClearColor    = (PFNGLCLEARCOLORPROC)     LOAD("glClearColor");
-    pFns->pfn_glClear         = (PFNGLCLEARPROC)          LOAD("glClear");
-    pFns->pfn_glClearDepth    = (PFNGLCLEARDEPTHPROC)     LOAD("glClearDepth");
+    pFns->ClearColor    = (PFNGLCLEARCOLORPROC)     LOAD("glClearColor");
+    pFns->Clear         = (PFNGLCLEARPROC)          LOAD("glClear");
+    pFns->ClearDepth    = (PFNGLCLEARDEPTHPROC)     LOAD("glClearDepth");
 
     #undef LOAD
 
