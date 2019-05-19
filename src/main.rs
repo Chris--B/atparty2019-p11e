@@ -269,41 +269,38 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
     }
 
     // Load Shaders
-
-    let sérusier_vert: u32;
+    let sérusier_prog: u32;
     unsafe {
+        // Load Vertex Shader
+
         let mut vert_src = include_bytes!("../glsl/sérusier.vert").clone();
         // Replaces the last newline with a NUL
         vert_src[vert_src.len() - 1] = 0;
         let vert_src = vert_src;
 
-        sérusier_vert = (gl.CreateShader)(ogl::GL_VERTEX_SHADER);
+        let sérusier_vert: u32 = (gl.CreateShader)(ogl::GL_VERTEX_SHADER);
 
         let p_vert_src: *const i8 = vert_src.as_ptr() as *const i8;
         (gl.ShaderSource)(sérusier_vert, 1, &p_vert_src, ptr::null());
 
         (gl.CompileShader)(sérusier_vert);
         check_compilation(&gl, sérusier_vert, &vert_src, "sérusier.vert");
-    }
 
-    let sérusier_frag: u32;
-    unsafe {
+        // Load Fragment Shader
         let mut frag_src = include_bytes!("../glsl/sérusier.frag").clone();
         // Replaces the last newline with a NUL
         frag_src[frag_src.len() - 1] = 0;
         let frag_src = frag_src;
 
-        sérusier_frag = (gl.CreateShader)(ogl::GL_FRAGMENT_SHADER);
+        let sérusier_frag: u32 = (gl.CreateShader)(ogl::GL_FRAGMENT_SHADER);
 
         let p_frag_src: *const i8 = frag_src.as_ptr() as *const i8;
         (gl.ShaderSource)(sérusier_frag, 1, &p_frag_src, ptr::null());
 
         (gl.CompileShader)(sérusier_frag);
         check_compilation(&gl, sérusier_frag, &frag_src, "sérusier.frag");
-    }
 
-    let sérusier_prog: u32;
-    unsafe {
+        // Link everything
         sérusier_prog = (gl.CreateProgram)();
         (gl.AttachShader)(sérusier_prog, sérusier_vert);
         (gl.AttachShader)(sérusier_prog, sérusier_frag);
@@ -312,12 +309,13 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
             "sérusier.vert",
             "sérusier.frag",
         ]);
-    }
 
-    println!("Shader handles:");
-    println!("    sérusier_vert == {}", sérusier_vert);
-    println!("    sérusier_frag == {}", sérusier_frag);
-    println!("    sérusier_prog == {}", sérusier_prog);
+        // Logging yay
+        println!("Shader handles:");
+        println!("    sérusier_vert == {}", sérusier_vert);
+        println!("    sérusier_frag == {}", sérusier_frag);
+        println!("    sérusier_prog == {}", sérusier_prog);
+    }
 
     let mut frame: u32 = 0;
     let mut keep_running: bool = true;
