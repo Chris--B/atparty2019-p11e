@@ -86,19 +86,10 @@ unsafe extern "system" fn wnd_proc(
     user::DefWindowProcA(h_wnd, msg, w_param, l_param)
 }
 
-/// Triangular Pyriamid
-/// See: https://en.wikipedia.org/wiki/Tetrahedron
-const FUNNY_SHAPE_POSITIONS: [[f32; 4]; 4] = [
-    [-1., 0., -1. / 1.41421356237_f32, 1.],
-    [ 1., 0., -1. / 1.41421356237_f32, 1.],
-    [-1., 0.,  1. / 1.41421356237_f32, 1.],
-    [ 1., 0.,  1. / 1.41421356237_f32, 1.],
-];
-
 fn check_compilation(
     &gl: &ogl::GlFuncs,
-    vert: u32,
-    vert_source: &[u8],
+    glsl: u32,
+    glsl_source: &[u8],
     name: &str,
 ) {
     #[cfg(feature = "enable_logging")]
@@ -106,14 +97,14 @@ fn check_compilation(
         print!("Checking compilation result of {}...", name);
 
         let mut success: i32 = 0;
-        (gl.GetShaderiv)(vert, ogl::GL_COMPILE_STATUS, &mut success);
+        (gl.GetShaderiv)(glsl, ogl::GL_COMPILE_STATUS, &mut success);
 
         if success == 0 {
             println!("failed");
 
             let mut info_buf: [u8; 512] = mem::zeroed();
             (gl.GetShaderInfoLog)(
-                vert,
+                glsl,
                 info_buf.len() as i32,
                 ptr::null_mut(),
                 &mut info_buf as *mut _ as *mut i8,
@@ -121,7 +112,7 @@ fn check_compilation(
             let info_str = core::str::from_utf8(&info_buf).unwrap();
 
             println!("Full Source:");
-            let source = core::str::from_utf8(vert_source).unwrap_or_default();
+            let source = core::str::from_utf8(glsl_source).unwrap_or_default();
             for (lineno, line) in source.split('\n').enumerate() {
                 let lineno = lineno + 1;
                 println!("{:>3}: {}", lineno, line);
@@ -134,6 +125,42 @@ fn check_compilation(
         }
     }
 }
+
+fn check_linkage(&gl: &ogl::GlFuncs, prog: u32, names: &[&str]) {
+    #[cfg(feature = "enable_logging")]
+    unsafe {
+        print!("Checking link result of ");
+        if let Some(name) = names.first() {
+            print!("{}", name);
+        }
+        for name in names.iter().skip(1) {
+            print!(", {}", name);
+        }
+        print!("...");
+
+        let mut success: i32 = 0;
+        (gl.GetProgramiv)(prog, ogl::GL_LINK_STATUS, &mut success);
+
+        if success == 0 {
+            println!("failed");
+
+            let mut info_buf: [u8; 512] = mem::zeroed();
+            (gl.GetProgramInfoLog)(
+                prog,
+                info_buf.len() as i32,
+                ptr::null_mut(),
+                &mut info_buf as *mut _ as *mut i8,
+            );
+            let info_str = core::str::from_utf8(&info_buf).unwrap();
+
+            println!("{}", info_str);
+            abort!();
+        } else {
+            println!("ok");
+        }
+    }
+}
+
 
 #[start]
 fn main(_argc: isize, _argv: *const *const u8) -> isize {
@@ -242,6 +269,7 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
     }
 
     // Load Shaders
+
     let sérusier_vert: u32;
     unsafe {
         let mut vert_src = include_bytes!("../glsl/sérusier.vert").clone();
@@ -257,6 +285,7 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         (gl.CompileShader)(sérusier_vert);
         check_compilation(&gl, sérusier_vert, &vert_src, "sérusier.vert");
     }
+
     let sérusier_frag: u32;
     unsafe {
         let mut frag_src = include_bytes!("../glsl/sérusier.frag").clone();
@@ -273,9 +302,22 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         check_compilation(&gl, sérusier_frag, &frag_src, "sérusier.frag");
     }
 
+    let sérusier_prog: u32;
+    unsafe {
+        sérusier_prog = (gl.CreateProgram)();
+        (gl.AttachShader)(sérusier_prog, sérusier_vert);
+        (gl.AttachShader)(sérusier_prog, sérusier_frag);
+        (gl.LinkProgram)(sérusier_prog);
+        check_linkage(&gl, sérusier_prog, &[
+            "sérusier.vert",
+            "sérusier.frag",
+        ]);
+    }
+
     println!("Shader handles:");
     println!("    sérusier_vert == {}", sérusier_vert);
     println!("    sérusier_frag == {}", sérusier_frag);
+    println!("    sérusier_prog == {}", sérusier_prog);
 
     let mut frame: u32 = 0;
     let mut keep_running: bool = true;

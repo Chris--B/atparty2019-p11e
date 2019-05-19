@@ -60,8 +60,10 @@ int ogl_load(GlFuncs* pFns)
     pFns->ClearDepth = (PFNGLCLEARDEPTHPROC)        load_fn(hOpenGL, &error, "glClearDepth");
 
     // Debug Only
-    pFns->GetShaderiv       = (PFNGLGETSHADERIVPROC)      load_fn(hOpenGL, &error, "glGetShaderiv");
-    pFns->GetShaderInfoLog  = (PFNGLGETSHADERINFOLOGPROC) load_fn(hOpenGL, &error, "glGetShaderInfoLog");
+    pFns->GetShaderiv       = (PFNGLGETSHADERIVPROC)        load_fn(hOpenGL, &error, "glGetShaderiv");
+    pFns->GetShaderInfoLog  = (PFNGLGETSHADERINFOLOGPROC)   load_fn(hOpenGL, &error, "glGetShaderInfoLog");
+    pFns->GetProgramiv      = (PFNGLGETPROGRAMIVPROC)       load_fn(hOpenGL, &error, "glGetProgramiv");
+    pFns->GetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)  load_fn(hOpenGL, &error, "glGetProgramInfoLog");
 
     return error;
 }

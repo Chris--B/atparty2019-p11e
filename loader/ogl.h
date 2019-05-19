@@ -41,8 +41,10 @@ typedef struct GlFuncs {
     PFNGLCLEARDEPTHPROC     ClearDepth;
 
     // Debug-Only
-    PFNGLGETSHADERIVPROC       GetShaderiv;
-    PFNGLGETSHADERINFOLOGPROC  GetShaderInfoLog;
+    PFNGLGETSHADERIVPROC        GetShaderiv;
+    PFNGLGETSHADERINFOLOGPROC   GetShaderInfoLog;
+    PFNGLGETPROGRAMIVPROC       GetProgramiv;
+    PFNGLGETPROGRAMINFOLOGPROC  GetProgramInfoLog;
 } GlFuncs;
 
 /// Loads required OpenGL functions into pFns.
