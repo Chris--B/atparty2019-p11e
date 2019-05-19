@@ -9,7 +9,7 @@ typedef void (*PFN)(void);
 //  OR
 //      return NULL and increment *pError
 // Crashes if pError is NULL.
-static PFN load_fn(const char* pName, HMODULE hOpenGL, int* pError)
+static PFN load_fn(HMODULE hOpenGL, int* pError, const char* pName)
 {
     PFN pfn = wglGetProcAddress(pName);
 
@@ -36,32 +36,32 @@ int ogl_load(GlFuncs* pFns)
 
     // This handle is meant to be leaked.
     // No `ogl_unload` is provided. Just exit the process.
-    pFns->hOpenGL = LoadLibraryA("OpenGL32");
-    if (pFns->hOpenGL == NULL) {
+    HMODULE hOpenGL = LoadLibraryA("OpenGL32");
+    if (hOpenGL == NULL) {
         return -2;
     }
-
+    pFns->hOpenGL = hOpenGL;
     int error = 0;
 
-    #define LOAD(NAME) load_fn((NAME), pFns->hOpenGL, &error);
-
     // Shaders
-    pFns->CreateShader  = (PFNGLCREATESHADERPROC)   LOAD("glCreateShader");
-    pFns->ShaderSource  = (PFNGLSHADERSOURCEPROC)   LOAD("glShaderSource");
-    pFns->CompileShader = (PFNGLCOMPILESHADERPROC)  LOAD("glCompileShader");
-    pFns->AttachShader  = (PFNGLATTACHSHADERPROC)   LOAD("glAttachShader");
+    pFns->CreateShader  = (PFNGLCREATESHADERPROC)   load_fn(hOpenGL, &error, "glCreateShader");
+    pFns->ShaderSource  = (PFNGLSHADERSOURCEPROC)   load_fn(hOpenGL, &error, "glShaderSource");
+    pFns->CompileShader = (PFNGLCOMPILESHADERPROC)  load_fn(hOpenGL, &error, "glCompileShader");
+    pFns->AttachShader  = (PFNGLATTACHSHADERPROC)   load_fn(hOpenGL, &error, "glAttachShader");
 
     // Shader Programs
-    pFns->CreateProgram = (PFNGLCREATEPROGRAMPROC)  LOAD("glCreateProgram");
-    pFns->LinkProgram   = (PFNGLLINKPROGRAMPROC)    LOAD("glLinkProgram");
-    pFns->UseProgram    = (PFNGLUSEPROGRAMPROC)     LOAD("glUseProgram");
+    pFns->CreateProgram = (PFNGLCREATEPROGRAMPROC)  load_fn(hOpenGL, &error, "glCreateProgram");
+    pFns->LinkProgram   = (PFNGLLINKPROGRAMPROC)    load_fn(hOpenGL, &error, "glLinkProgram");
+    pFns->UseProgram    = (PFNGLUSEPROGRAMPROC)     load_fn(hOpenGL, &error, "glUseProgram");
 
     // Buffers and Presenting
-    pFns->ClearColor    = (PFNGLCLEARCOLORPROC)     LOAD("glClearColor");
-    pFns->Clear         = (PFNGLCLEARPROC)          LOAD("glClear");
-    pFns->ClearDepth    = (PFNGLCLEARDEPTHPROC)     LOAD("glClearDepth");
+    pFns->ClearColor = (PFNGLCLEARCOLORPROC)        load_fn(hOpenGL, &error, "glClearColor");
+    pFns->Clear      = (PFNGLCLEARPROC)             load_fn(hOpenGL, &error, "glClear");
+    pFns->ClearDepth = (PFNGLCLEARDEPTHPROC)        load_fn(hOpenGL, &error, "glClearDepth");
 
-    #undef LOAD
+    // Debug Only
+    pFns->GetShaderiv       = (PFNGLGETSHADERIVPROC)      load_fn(hOpenGL, &error, "glGetShaderiv");
+    pFns->GetShaderInfoLog  = (PFNGLGETSHADERINFOLOGPROC) load_fn(hOpenGL, &error, "glGetShaderInfoLog");
 
     return error;
 }

@@ -4,6 +4,8 @@
 // Useful - but we could remove these if we needed to.
 #![feature(core_intrinsics)]
 #![feature(panic_info_message)]
+// Because I *can*.
+#![feature(non_ascii_idents)]
 
 use core::{
     mem,
@@ -82,6 +84,55 @@ unsafe extern "system" fn wnd_proc(
         _ => {},
     }
     user::DefWindowProcA(h_wnd, msg, w_param, l_param)
+}
+
+/// Triangular Pyriamid
+/// See: https://en.wikipedia.org/wiki/Tetrahedron
+const FUNNY_SHAPE_POSITIONS: [[f32; 4]; 4] = [
+    [-1., 0., -1. / 1.41421356237_f32, 1.],
+    [ 1., 0., -1. / 1.41421356237_f32, 1.],
+    [-1., 0.,  1. / 1.41421356237_f32, 1.],
+    [ 1., 0.,  1. / 1.41421356237_f32, 1.],
+];
+
+fn check_compilation(
+    &gl: &ogl::GlFuncs,
+    vert: u32,
+    vert_source: &[u8],
+    name: &str,
+) {
+    #[cfg(feature = "enable_logging")]
+    unsafe {
+        print!("Checking compilation result of {}...", name);
+
+        let mut success: i32 = 0;
+        (gl.GetShaderiv)(vert, ogl::GL_COMPILE_STATUS, &mut success);
+
+        if success == 0 {
+            println!("failed");
+
+            let mut info_buf: [u8; 512] = mem::zeroed();
+            (gl.GetShaderInfoLog)(
+                vert,
+                info_buf.len() as i32,
+                ptr::null_mut(),
+                &mut info_buf as *mut _ as *mut i8,
+            );
+            let info_str = core::str::from_utf8(&info_buf).unwrap();
+
+            println!("Full Source:");
+            let source = core::str::from_utf8(vert_source).unwrap_or_default();
+            for (lineno, line) in source.split('\n').enumerate() {
+                let lineno = lineno + 1;
+                println!("{:>3}: {}", lineno, line);
+            }
+
+            println!("{}", info_str);
+            abort!();
+        } else {
+            println!("ok");
+        }
+    }
 }
 
 #[start]
@@ -190,6 +241,42 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         (gl.ClearColor)(0., 0., 0., 0.);
     }
 
+    // Load Shaders
+    let sérusier_vert: u32;
+    unsafe {
+        let mut vert_src = include_bytes!("../glsl/sérusier.vert").clone();
+        // Replaces the last newline with a NUL
+        vert_src[vert_src.len() - 1] = 0;
+        let vert_src = vert_src;
+
+        sérusier_vert = (gl.CreateShader)(ogl::GL_VERTEX_SHADER);
+
+        let p_vert_src: *const i8 = vert_src.as_ptr() as *const i8;
+        (gl.ShaderSource)(sérusier_vert, 1, &p_vert_src, ptr::null());
+
+        (gl.CompileShader)(sérusier_vert);
+        check_compilation(&gl, sérusier_vert, &vert_src, "sérusier.vert");
+    }
+    let sérusier_frag: u32;
+    unsafe {
+        let mut frag_src = include_bytes!("../glsl/sérusier.frag").clone();
+        // Replaces the last newline with a NUL
+        frag_src[frag_src.len() - 1] = 0;
+        let frag_src = frag_src;
+
+        sérusier_frag = (gl.CreateShader)(ogl::GL_FRAGMENT_SHADER);
+
+        let p_frag_src: *const i8 = frag_src.as_ptr() as *const i8;
+        (gl.ShaderSource)(sérusier_frag, 1, &p_frag_src, ptr::null());
+
+        (gl.CompileShader)(sérusier_frag);
+        check_compilation(&gl, sérusier_frag, &frag_src, "sérusier.frag");
+    }
+
+    println!("Shader handles:");
+    println!("    sérusier_vert == {}", sérusier_vert);
+    println!("    sérusier_frag == {}", sérusier_frag);
+
     let mut frame: u32 = 0;
     let mut keep_running: bool = true;
     let mut ret_code: isize = 0;
@@ -231,9 +318,7 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         }
 
         unsafe {
-            (gl.Clear)(
-                ogl::GL_COLOR_BUFFER_BIT | ogl::GL_DEPTH_BUFFER_BIT,
-            );
+            (gl.Clear)(ogl::GL_COLOR_BUFFER_BIT | ogl::GL_DEPTH_BUFFER_BIT);
 
             // TODO: Render things. Triangles maybe?
 
