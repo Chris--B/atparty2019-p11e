@@ -1,4 +1,5 @@
 @echo off
 cargo fmt || goto :EOF
-cargo run --release || goto :EOF
-tools/post-build.cmd
+cargo build --release || goto :EOF
+stat -c "%%n -- %%s bytes" %CARGO_TARGET_DIR%\release\p11e.exe
+cargo run --release

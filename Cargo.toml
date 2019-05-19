@@ -25,7 +25,7 @@ cfg-if = "0.1"
 version = '0.3'
 features = [
     "debugapi",
-    # "libloaderapi",
+    "libloaderapi",
     "winuser",
     "wingdi",
     "errhandlingapi"

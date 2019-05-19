@@ -21,6 +21,9 @@
 #include "glad_46.h"
 
 typedef struct GlFuncs {
+    /// OpenGL32 module - must outlive the pointers in this struct.
+    uint64_t                hOpenGL;
+
     // Shaders
     PFNGLCREATESHADERPROC   pfn_glCreateShader;
     PFNGLSHADERSOURCEPROC   pfn_glShaderSource;

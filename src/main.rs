@@ -13,6 +13,7 @@ use core::{
 use winapi::um::errhandlingapi::GetLastError;
 use winapi::{
     shared::windef,
+    um::libloaderapi,
     um::wingdi as gdi,
     um::winuser as user,
 };
@@ -52,6 +53,37 @@ impl Window {
     }
 }
 
+unsafe extern "system" fn wnd_proc(
+    h_wnd: windef::HWND,
+    msg: u32,
+    w_param: usize,
+    l_param: isize,
+) -> isize {
+    match msg {
+        user::WM_SIZE => {
+            let width = l_param & 0xffff;
+            let height = l_param >> 16;
+            println!("WM_Size: {} x {}", width, height);
+        },
+        user::WM_CHAR => {
+            match w_param as i32 {
+                // ESC closes the window
+                user::VK_ESCAPE => {
+                    user::PostQuitMessage(0);
+                    return 0;
+                },
+                _ => {},
+            }
+        },
+        user::WM_DESTROY => {
+            user::PostQuitMessage(0);
+            return 0;
+        },
+        _ => {},
+    }
+    user::DefWindowProcA(h_wnd, msg, w_param, l_param)
+}
+
 #[start]
 fn main(_argc: isize, _argv: *const *const u8) -> isize {
     // Initialize a Window and rendering context
@@ -61,20 +93,39 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         let h_dc: windef::HDC;
         let h_glrc: windef::HGLRC;
 
+        // Create Window class
+        let h_instance = libloaderapi::GetModuleHandleA(ptr::null_mut());
+
+        const THING_NAME: *const i8 = b"yo\0".as_ptr() as *const _;
+
+        let wc = user::WNDCLASSA {
+            style: user::CS_OWNDC,
+            lpfnWndProc: Some(wnd_proc),
+            hInstance: h_instance,
+            hIcon: user::LoadIconW(ptr::null_mut(), user::IDI_WINLOGO),
+            hCursor: user::LoadCursorW(ptr::null_mut(), user::IDC_ARROW),
+            lpszClassName: THING_NAME,
+
+            ..mem::zeroed()
+        };
+        user::RegisterClassA(&wc);
+
         // Create Window handle
+        let ex_style = user::WS_EX_APPWINDOW | user::WS_EX_WINDOWEDGE;
+        let style = user::WS_OVERLAPPEDWINDOW | user::WS_VISIBLE;
         h_wnd = user::CreateWindowExA(
-            0 as _,                            // DWORD     dwExStyle
-            b"edit\0".as_ptr() as *const i8,   // LPCSTR    lpClassName
-            b"yo\0".as_ptr() as *const i8,     // LPCSTR    lpWindowName
-            user::WS_POPUP | user::WS_VISIBLE, // DWORD     dwStyle
-            0,                                 // int       X
-            0,                                 // int       Y
-            0,                                 // int       nWidth
-            0,                                 // int       nHeight
-            ptr::null_mut(),                   // HWND      hWndParent
-            ptr::null_mut(),                   // HMENU     hMenu
-            ptr::null_mut(),                   // HINSTANCE hInstance
-            ptr::null_mut(),                   // LPVOID    lpPara
+            ex_style,        // DWORD     dwExStyle
+            THING_NAME,      // LPCSTR    lpClassName
+            THING_NAME,      // LPCSTR    lpWindowName
+            style,           // DWORD     dwStyle
+            0,               // int       X
+            0,               // int       Y
+            800,             // int       nWidth
+            600,             // int       nHeight
+            ptr::null_mut(), // HWND      hWndParent
+            ptr::null_mut(), // HMENU     hMenu
+            ptr::null_mut(), // HINSTANCE hInstance
+            ptr::null_mut(), // LPVOID    lpPara
         );
         if h_wnd == ptr::null_mut() {
             abort!("CreateWindowExA failed: {}", GetLastError());
@@ -87,9 +138,7 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         }
 
         let pixel_desc = gdi::PIXELFORMATDESCRIPTOR {
-            dwFlags: gdi::PFD_DRAW_TO_WINDOW
-                | gdi::PFD_SUPPORT_OPENGL
-                | gdi::PFD_DOUBLEBUFFER,
+            dwFlags: gdi::PFD_SUPPORT_OPENGL | gdi::PFD_DOUBLEBUFFER,
             iPixelType: gdi::PFD_TYPE_RGBA,
 
             ..mem::zeroed()
@@ -113,6 +162,9 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
                 h_glrc as usize
             );
         }
+
+        // user::ShowCursor(0);
+
         window = Window {
             h_wnd,
             h_dc,
@@ -135,5 +187,62 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
     // We're ready to roll.
     println!("{:#?}", gl);
 
-    0
+    let mut frame: u32 = 0;
+
+    let mut keep_running: bool = true;
+    let mut ret_code: isize = 0;
+    while keep_running {
+        // Win32 boilerplate
+        unsafe {
+            loop {
+                let mut msg: user::MSG = mem::zeroed();
+
+                // Returns nonzero if there's a message
+                let got_msg = user::PeekMessageA(
+                    &mut msg,
+                    ptr::null_mut(),
+                    0,
+                    0,
+                    user::PM_REMOVE,
+                );
+                if got_msg != 0 {
+                    match msg.message {
+                        user::WM_QUIT => {
+                            keep_running = false;
+                            ret_code = msg.wParam as isize;
+                        },
+                        _ => {
+                            user::TranslateMessage(&mut msg);
+                            user::DispatchMessageA(&mut msg);
+                        },
+                    };
+                } else {
+                    break;
+                }
+            }
+        }
+
+        unsafe {
+            if frame % 2 == 0 {
+                (gl.pfn_glClearColor)(1., 0., 1., 1.);
+            } else {
+                (gl.pfn_glClearColor)(0., 1., 0., 1.);
+            }
+        }
+
+        unsafe {
+            (gl.pfn_glClear)(
+                ogl::GL_COLOR_BUFFER_BIT | ogl::GL_DEPTH_BUFFER_BIT,
+            );
+            // Block until rendering finishes and the swapchain presents (??)
+            let res = gdi::SwapBuffers(window.h_dc);
+            if res == 0 {
+                println!("gdi::SwapBuffers() failed: {}", res);
+            } else {
+                frame += 1;
+            }
+        }
+    }
+
+    ret_code
 }
