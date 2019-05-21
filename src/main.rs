@@ -32,7 +32,7 @@ mod debug;
 mod rt;
 
 // OpenGL Loader
-#[allow(bad_style)]
+#[allow(bad_style, dead_code)]
 mod ogl;
 
 /// Contains platform-specific handles for managing a window and OpenGL context
@@ -97,6 +97,13 @@ fn check_compilation(
     glsl_source: &[u8],
     name: &str,
 ) {
+    #[cfg(not(feature = "enable_logging"))]
+    {
+        mem::drop(gl);
+        mem::drop(glsl);
+        mem::drop(glsl_source);
+        mem::drop(name);
+    }
     #[cfg(feature = "enable_logging")]
     unsafe {
         print!("Checking compilation result of {}...", name);
@@ -132,6 +139,13 @@ fn check_compilation(
 }
 
 fn check_linkage(&gl: &ogl::GlFuncs, prog: u32, names: &[&str]) {
+    #[cfg(not(feature = "enable_logging"))]
+    {
+        mem::drop(gl);
+        mem::drop(prog);
+        mem::drop(names);
+    }
+
     #[cfg(feature = "enable_logging")]
     unsafe {
         print!("Checking link result of ");
@@ -363,6 +377,7 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         }
 
         // If we're resizing, do the GL thing
+        #[cfg(feature = "dev_build")]
         unsafe {
             let packed: u32 =
                 PENDING_RESIZE.swap(core::i32::MAX, Ordering::SeqCst) as u32;

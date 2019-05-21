@@ -11,7 +11,15 @@ fn main() {
 
     // Our OpenGL loader is written in C because we're lazy.
     cc::Build::new()
-        .file("loader/ogl.c")
+        .define(
+            "P11E_DEVBUILD",
+            if cfg!(feature = "dev_build") {
+                "1"
+            } else {
+                "0"
+            },
+        )
         .include("loader")
+        .file("loader/ogl.c")
         .compile("ogl_loader");
 }

@@ -38,7 +38,8 @@ pub type PFNGLCLEARCOLORPROC = unsafe extern "C" fn(
     alpha: GLfloat,
 );
 pub type PFNGLCLEARDEPTHPROC = unsafe extern "C" fn(depth: GLdouble);
-pub type PFNGLVIEWPORTPROC = unsafe extern "C" fn(x: GLint, y: GLint, width: GLsizei, height: GLsizei);
+pub type PFNGLVIEWPORTPROC =
+    unsafe extern "C" fn(x: GLint, y: GLint, width: GLsizei, height: GLsizei);
 pub type PFNGLDRAWARRAYSPROC =
     unsafe extern "C" fn(mode: GLenum, first: GLint, count: GLsizei);
 pub type PFNGLATTACHSHADERPROC =
@@ -86,10 +87,16 @@ pub struct GlFuncs {
     pub Clear: PFNGLCLEARPROC,
     pub ClearDepth: PFNGLCLEARDEPTHPROC,
     pub DrawArrays: PFNGLDRAWARRAYSPROC,
+
+    #[cfg(feature = "dev_build")]
     pub GetShaderiv: PFNGLGETSHADERIVPROC,
+    #[cfg(feature = "dev_build")]
     pub GetShaderInfoLog: PFNGLGETSHADERINFOLOGPROC,
+    #[cfg(feature = "dev_build")]
     pub GetProgramiv: PFNGLGETPROGRAMIVPROC,
+    #[cfg(feature = "dev_build")]
     pub GetProgramInfoLog: PFNGLGETPROGRAMINFOLOGPROC,
+    #[cfg(feature = "dev_build")]
     pub Viewport: PFNGLVIEWPORTPROC,
 }
 extern "C" {

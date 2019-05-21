@@ -44,11 +44,13 @@ typedef struct GlFuncs {
     PFNGLDRAWARRAYSPROC     DrawArrays;
 
     // Debug-Only
-    PFNGLGETSHADERIVPROC        GetShaderiv;
-    PFNGLGETSHADERINFOLOGPROC   GetShaderInfoLog;
-    PFNGLGETPROGRAMIVPROC       GetProgramiv;
-    PFNGLGETPROGRAMINFOLOGPROC  GetProgramInfoLog;
-    PFNGLVIEWPORTPROC           Viewport;
+    #if P11E_DEVBUILD
+        PFNGLGETSHADERIVPROC        GetShaderiv;
+        PFNGLGETSHADERINFOLOGPROC   GetShaderInfoLog;
+        PFNGLGETPROGRAMIVPROC       GetProgramiv;
+        PFNGLGETPROGRAMINFOLOGPROC  GetProgramInfoLog;
+        PFNGLVIEWPORTPROC           Viewport;
+    #endif
 } GlFuncs;
 
 /// Loads required OpenGL functions into pFns.

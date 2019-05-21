@@ -63,11 +63,13 @@ int ogl_load(GlFuncs* pFns)
     pFns->DrawArrays = (PFNGLDRAWARRAYSPROC)        load_fn(hOpenGL, &error, "glDrawArrays");
 
     // Debug Only
-    pFns->GetShaderiv       = (PFNGLGETSHADERIVPROC)        load_fn(hOpenGL, &error, "glGetShaderiv");
-    pFns->GetShaderInfoLog  = (PFNGLGETSHADERINFOLOGPROC)   load_fn(hOpenGL, &error, "glGetShaderInfoLog");
-    pFns->GetProgramiv      = (PFNGLGETPROGRAMIVPROC)       load_fn(hOpenGL, &error, "glGetProgramiv");
-    pFns->GetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)  load_fn(hOpenGL, &error, "glGetProgramInfoLog");
-    pFns->Viewport          = (PFNGLVIEWPORTPROC)           load_fn(hOpenGL, &error, "glViewport");
+    #if P11E_DEVBUILD
+        pFns->GetShaderiv       = (PFNGLGETSHADERIVPROC)        load_fn(hOpenGL, &error, "glGetShaderiv");
+        pFns->GetShaderInfoLog  = (PFNGLGETSHADERINFOLOGPROC)   load_fn(hOpenGL, &error, "glGetShaderInfoLog");
+        pFns->GetProgramiv      = (PFNGLGETPROGRAMIVPROC)       load_fn(hOpenGL, &error, "glGetProgramiv");
+        pFns->GetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)  load_fn(hOpenGL, &error, "glGetProgramInfoLog");
+        pFns->Viewport          = (PFNGLVIEWPORTPROC)           load_fn(hOpenGL, &error, "glViewport");
+    #endif
 
     return error;
 }
