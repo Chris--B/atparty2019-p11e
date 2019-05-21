@@ -10,6 +10,10 @@
 use core::{
     mem,
     ptr,
+    sync::atomic::{
+        AtomicI32,
+        Ordering,
+    },
 };
 
 use winapi::um::errhandlingapi::GetLastError;
@@ -55,6 +59,8 @@ impl Window {
     }
 }
 
+static PENDING_RESIZE: AtomicI32 = AtomicI32::new(-1);
+
 unsafe extern "system" fn wnd_proc(
     h_wnd: windef::HWND,
     msg: u32,
@@ -63,9 +69,8 @@ unsafe extern "system" fn wnd_proc(
 ) -> isize {
     match msg {
         user::WM_SIZE => {
-            let width = l_param & 0xffff;
-            let height = l_param >> 16;
-            println!("WM_Size: {} x {}", width, height);
+            // println!("WM_Size: {} x {}", width, height);
+            PENDING_RESIZE.store(l_param as i32, Ordering::SeqCst);
         },
         user::WM_CHAR => {
             match w_param as i32 {
@@ -357,12 +362,24 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
             break;
         }
 
+        // If we're resizing, do the GL thing
+        unsafe {
+            let packed: u32 =
+                PENDING_RESIZE.swap(core::i32::MAX, Ordering::SeqCst) as u32;
+            if packed != core::i32::MAX as u32 {
+                let width = packed & 0xffff;
+                let height = packed >> 16;
+
+                (gl.Viewport)(0, 0, width as i32, height as i32);
+            }
+        }
+
         unsafe {
             (gl.Clear)(ogl::GL_COLOR_BUFFER_BIT | ogl::GL_DEPTH_BUFFER_BIT);
 
             // TODO: Render things. Triangles maybe?
             (gl.UseProgram)(sérusier_prog);
-            (gl.DrawArrays)(ogl::GL_TRIANGLE_STRIP, 0, 6);
+            (gl.DrawArrays)(ogl::GL_TRIANGLES, 0, 4 * 6);
 
             // Block until rendering finishes and the swapchain presents (??)
             let res = gdi::SwapBuffers(window.h_dc);

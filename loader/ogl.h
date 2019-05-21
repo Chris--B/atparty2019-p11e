@@ -48,6 +48,7 @@ typedef struct GlFuncs {
     PFNGLGETSHADERINFOLOGPROC   GetShaderInfoLog;
     PFNGLGETPROGRAMIVPROC       GetProgramiv;
     PFNGLGETPROGRAMINFOLOGPROC  GetProgramInfoLog;
+    PFNGLVIEWPORTPROC           Viewport;
 } GlFuncs;
 
 /// Loads required OpenGL functions into pFns.

@@ -67,6 +67,7 @@ int ogl_load(GlFuncs* pFns)
     pFns->GetShaderInfoLog  = (PFNGLGETSHADERINFOLOGPROC)   load_fn(hOpenGL, &error, "glGetShaderInfoLog");
     pFns->GetProgramiv      = (PFNGLGETPROGRAMIVPROC)       load_fn(hOpenGL, &error, "glGetProgramiv");
     pFns->GetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)  load_fn(hOpenGL, &error, "glGetProgramInfoLog");
+    pFns->Viewport          = (PFNGLVIEWPORTPROC)           load_fn(hOpenGL, &error, "glViewport");
 
     return error;
 }
