@@ -6,6 +6,7 @@
 #![feature(panic_info_message)]
 // Because I *can*.
 #![feature(non_ascii_idents)]
+#![cfg_attr(not(feature = "dev_build"), windows_subsystem = "windows")]
 
 use core::{
     mem,
