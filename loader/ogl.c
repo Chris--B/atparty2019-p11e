@@ -11,12 +11,12 @@ typedef void (*PFN)(void);
 // Crashes if pError is NULL.
 static PFN load_fn(HMODULE hOpenGL, int* pError, const char* pName)
 {
-    PFN pfn = wglGetProcAddress(pName);
+    PFN pfn = (PFN)wglGetProcAddress(pName);
 
     if (pfn == NULL) {
         // OpenGL 1.x/2.x functions may not load from wglGetProcAddress,
         // so load them through OpenGL32 directly.
-        pfn = GetProcAddress(hOpenGL, pName);
+        pfn = (PFN)GetProcAddress(hOpenGL, pName);
     }
 
     if (pfn == NULL) {
@@ -40,7 +40,7 @@ int ogl_load(GlFuncs* pFns)
     if (hOpenGL == NULL) {
         return -2;
     }
-    pFns->hOpenGL = hOpenGL;
+    pFns->hOpenGL = (uint64_t)hOpenGL;
     int error = 0;
 
     // Shaders
@@ -58,6 +58,9 @@ int ogl_load(GlFuncs* pFns)
     pFns->ClearColor = (PFNGLCLEARCOLORPROC)        load_fn(hOpenGL, &error, "glClearColor");
     pFns->Clear      = (PFNGLCLEARPROC)             load_fn(hOpenGL, &error, "glClear");
     pFns->ClearDepth = (PFNGLCLEARDEPTHPROC)        load_fn(hOpenGL, &error, "glClearDepth");
+
+    // Drawing Geometry
+    pFns->DrawArrays = (PFNGLDRAWARRAYSPROC)        load_fn(hOpenGL, &error, "glDrawArrays");
 
     // Debug Only
     pFns->GetShaderiv       = (PFNGLGETSHADERIVPROC)        load_fn(hOpenGL, &error, "glGetShaderiv");

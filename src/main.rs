@@ -361,6 +361,8 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
             (gl.Clear)(ogl::GL_COLOR_BUFFER_BIT | ogl::GL_DEPTH_BUFFER_BIT);
 
             // TODO: Render things. Triangles maybe?
+            (gl.UseProgram)(sérusier_prog);
+            (gl.DrawArrays)(ogl::GL_TRIANGLE_STRIP, 0, 6);
 
             // Block until rendering finishes and the swapchain presents (??)
             let res = gdi::SwapBuffers(window.h_dc);
@@ -371,6 +373,8 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
             }
         }
     }
+
+    println!("Rendered {} frames", frame);
 
     ret_code
 }

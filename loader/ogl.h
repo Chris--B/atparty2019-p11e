@@ -40,6 +40,9 @@ typedef struct GlFuncs {
     PFNGLCLEARPROC          Clear;
     PFNGLCLEARDEPTHPROC     ClearDepth;
 
+    // Drawing Geometry
+    PFNGLDRAWARRAYSPROC     DrawArrays;
+
     // Debug-Only
     PFNGLGETSHADERIVPROC        GetShaderiv;
     PFNGLGETSHADERINFOLOGPROC   GetShaderInfoLog;
