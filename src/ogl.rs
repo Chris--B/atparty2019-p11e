@@ -30,49 +30,60 @@ pub type GLsizei = libc::c_int;
 pub type GLfloat = f32;
 pub type GLdouble = f64;
 pub type GLchar = libc::c_char;
-pub type PFNGLCLEARPROC = unsafe extern "C" fn(mask: GLbitfield);
-pub type PFNGLCLEARCOLORPROC = unsafe extern "C" fn(
+pub type PFNGLCLEARPROC = unsafe extern "system" fn(mask: GLbitfield);
+pub type PFNGLCLEARCOLORPROC = unsafe extern "system" fn(
     red: GLfloat,
     green: GLfloat,
     blue: GLfloat,
     alpha: GLfloat,
 );
-pub type PFNGLCLEARDEPTHPROC = unsafe extern "C" fn(depth: GLdouble);
-pub type PFNGLVIEWPORTPROC =
-    unsafe extern "C" fn(x: GLint, y: GLint, width: GLsizei, height: GLsizei);
+pub type PFNGLCLEARDEPTHPROC = unsafe extern "system" fn(depth: GLdouble);
+pub type PFNGLVIEWPORTPROC = unsafe extern "system" fn(
+    x: GLint,
+    y: GLint,
+    width: GLsizei,
+    height: GLsizei,
+);
 pub type PFNGLDRAWARRAYSPROC =
-    unsafe extern "C" fn(mode: GLenum, first: GLint, count: GLsizei);
+    unsafe extern "system" fn(mode: GLenum, first: GLint, count: GLsizei);
 pub type PFNGLATTACHSHADERPROC =
-    unsafe extern "C" fn(program: GLuint, shader: GLuint);
-pub type PFNGLCOMPILESHADERPROC = unsafe extern "C" fn(shader: GLuint);
-pub type PFNGLCREATEPROGRAMPROC = unsafe extern "C" fn() -> GLuint;
-pub type PFNGLCREATESHADERPROC = unsafe extern "C" fn(type_: GLenum) -> GLuint;
-pub type PFNGLGETPROGRAMIVPROC =
-    unsafe extern "C" fn(program: GLuint, pname: GLenum, params: *mut GLint);
-pub type PFNGLGETPROGRAMINFOLOGPROC = unsafe extern "C" fn(
+    unsafe extern "system" fn(program: GLuint, shader: GLuint);
+pub type PFNGLCOMPILESHADERPROC = unsafe extern "system" fn(shader: GLuint);
+pub type PFNGLCREATEPROGRAMPROC = unsafe extern "system" fn() -> GLuint;
+pub type PFNGLCREATESHADERPROC =
+    unsafe extern "system" fn(type_: GLenum) -> GLuint;
+pub type PFNGLGETPROGRAMIVPROC = unsafe extern "system" fn(
+    program: GLuint,
+    pname: GLenum,
+    params: *mut GLint,
+);
+pub type PFNGLGETPROGRAMINFOLOGPROC = unsafe extern "system" fn(
     program: GLuint,
     bufSize: GLsizei,
     length: *mut GLsizei,
     infoLog: *mut GLchar,
 );
-pub type PFNGLGETSHADERIVPROC =
-    unsafe extern "C" fn(shader: GLuint, pname: GLenum, params: *mut GLint);
-pub type PFNGLGETSHADERINFOLOGPROC = unsafe extern "C" fn(
+pub type PFNGLGETSHADERIVPROC = unsafe extern "system" fn(
+    shader: GLuint,
+    pname: GLenum,
+    params: *mut GLint,
+);
+pub type PFNGLGETSHADERINFOLOGPROC = unsafe extern "system" fn(
     shader: GLuint,
     bufSize: GLsizei,
     length: *mut GLsizei,
     infoLog: *mut GLchar,
 );
-pub type PFNGLLINKPROGRAMPROC = unsafe extern "C" fn(program: GLuint);
-pub type PFNGLSHADERSOURCEPROC = unsafe extern "C" fn(
+pub type PFNGLLINKPROGRAMPROC = unsafe extern "system" fn(program: GLuint);
+pub type PFNGLSHADERSOURCEPROC = unsafe extern "system" fn(
     shader: GLuint,
     count: GLsizei,
     string: *const *const GLchar,
     length: *const GLint,
 );
-pub type PFNGLUSEPROGRAMPROC = unsafe extern "C" fn(program: GLuint);
+pub type PFNGLUSEPROGRAMPROC = unsafe extern "system" fn(program: GLuint);
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone)]
 pub struct GlFuncs {
     /// OpenGL32 module - must outlive the pointers in this struct.
     pub hOpenGL: u64,
