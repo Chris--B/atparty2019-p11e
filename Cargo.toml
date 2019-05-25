@@ -1,7 +1,7 @@
 [package]
 name = "p11e"
 version = "0.1.0"
-authors = ["Chris Butler <chris.butler@amd.com>"]
+authors = ["Chris Butler <chrisbutler296@gmail.com>"]
 edition = "2018"
 
 ## Build Configurations
