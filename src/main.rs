@@ -181,8 +181,8 @@ fn check_linkage(&gl: &ogl::GlFuncs, prog: u32, names: &[&str]) {
     }
 }
 
-#[no_mangle]
 #[start]
+#[no_mangle]
 fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
     // Initialize a Window and rendering context
     let window: Window;
