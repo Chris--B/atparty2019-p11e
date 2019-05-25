@@ -32,11 +32,25 @@ const uint tetra_index[] = {
     0, 2, 3,
 };
 
-varying vec4 vColor;
+const mat4 uProj = {
+    vec4(1., 0., 0., 0.),
+    vec4(0., 1., 0., 0.),
+    vec4(0., 0., 1., 0.),
+    vec4(0., 0., 0., 1.)
+};
+
+const mat4 uView = {
+    vec4(1., 0., 0., 0.),
+    vec4(0., 1., 0., 0.),
+    vec4(0., 0., 1., 0.),
+    vec4(0., 0., 0., 1.)
+};
+
+layout(location = 0) out vec4 vColor;
 
 void main() {
     vec4 pos = tetra_pos[tetra_index[gl_VertexID % 6]];
-    pos += (vec4(0.5) * tetra_offsets[gl_VertexID / 6]);
+    pos += (vec4(0.25) * tetra_offsets[gl_VertexID / 6]);
     vColor = tetra_color[tetra_index[gl_VertexID % 6]];
-    gl_Position = pos;
+    gl_Position = uProj * uView * pos;
 }
