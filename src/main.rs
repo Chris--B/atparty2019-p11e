@@ -38,7 +38,7 @@ mod ogl;
 
 /// Contains platform-specific handles for managing a window and OpenGL context
 #[derive(Debug)]
-pub struct Window {
+struct Window {
     /// Handle to Window
     h_wnd: windef::HWND,
 
