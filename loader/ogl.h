@@ -31,9 +31,12 @@ typedef struct GlFuncs {
     PFNGLATTACHSHADERPROC   AttachShader;
 
     // Shader Programs
-    PFNGLCREATEPROGRAMPROC  CreateProgram;
-    PFNGLLINKPROGRAMPROC    LinkProgram;
-    PFNGLUSEPROGRAMPROC     UseProgram;
+    PFNGLCREATEPROGRAMPROC    CreateProgram;
+    PFNGLLINKPROGRAMPROC      LinkProgram;
+    PFNGLUSEPROGRAMPROC       UseProgram;
+
+    // Shader Inputs
+    PFNGLUNIFORMMATRIX4FVPROC UniformMatrix4fv;
 
     // Buffers and Presenting
     PFNGLCLEARCOLORPROC     ClearColor;

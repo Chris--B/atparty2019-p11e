@@ -54,6 +54,8 @@ int ogl_load(GlFuncs* pFns)
     pFns->LinkProgram   = (PFNGLLINKPROGRAMPROC)    load_fn(hOpenGL, &error, "glLinkProgram");
     pFns->UseProgram    = (PFNGLUSEPROGRAMPROC)     load_fn(hOpenGL, &error, "glUseProgram");
 
+    pFns->UniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC) load_fn(hOpenGL, &error, "glUniformMatrix4fv");
+
     // Buffers and Presenting
     pFns->ClearColor = (PFNGLCLEARCOLORPROC)        load_fn(hOpenGL, &error, "glClearColor");
     pFns->Clear      = (PFNGLCLEARPROC)             load_fn(hOpenGL, &error, "glClear");

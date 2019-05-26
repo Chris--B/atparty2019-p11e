@@ -86,6 +86,7 @@ impl fmt::Debug for crate::ogl::GlFuncs {
             .field("glCreateProgram", &Hex(self.CreateProgram as usize))
             .field("glLinkProgram", &Hex(self.LinkProgram as usize))
             .field("glUseProgram", &Hex(self.UseProgram as usize))
+            .field("glUniformMatrix4fv", &Hex(self.UniformMatrix4fv as usize))
             .field("glClearColor", &Hex(self.ClearColor as usize))
             .field("glClear", &Hex(self.Clear as usize))
             .field("glClearDepth", &Hex(self.ClearDepth as usize))

@@ -22,6 +22,10 @@ enable_logging = []
 libc = "0.2.54"
 cfg-if = "0.1"
 
+[dependencies.nalgebra]
+version = "0.18"
+default-features = false
+
 [target.'cfg(windows)'.dependencies.winapi]
 version = '0.3'
 features = [

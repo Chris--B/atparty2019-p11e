@@ -17,6 +17,7 @@ use core::{
     },
 };
 
+use nalgebra;
 use winapi::um::errhandlingapi::GetLastError;
 use winapi::{
     shared::windef,
@@ -49,16 +50,9 @@ struct Window {
     h_glrc: windef::HGLRC,
 }
 
-impl Window {
-    pub fn swap_buffers(&mut self) {
-        unsafe {
-            let res: i32 = gdi::SwapBuffers(self.h_dc);
-            if res == 0 {
-                abort!("gdi::SwapBuffers(0x{:x}) failed!", self.h_dc as usize);
-            }
-        }
-    }
-}
+type Mat4 = nalgebra::Matrix4<f32>;
+type Point3 = nalgebra::Point3<f32>;
+type Vec3 = nalgebra::Vector3<f32>;
 
 static PENDING_RESIZE: AtomicI32 = AtomicI32::new(-1);
 
@@ -342,6 +336,19 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut frame: u32 = 0;
     let mut keep_running: bool = true;
     let mut ret_code: isize = 0;
+
+    let mut proj = Mat4::new_perspective(
+        1.0,  // aspect ratio
+        90.,  // fovy
+        0.1,  // znear
+        100., // zfar
+    );
+    let mut view = Mat4::look_at_rh(
+        &Point3::new(10., 10., 2.), // eye
+        &Point3::new(0., 0., 0.),   // center
+        &Vec3::new(0., 0., 1.),     // up
+    );
+
     while keep_running {
         // Win32 boilerplate
         unsafe {
@@ -388,6 +395,13 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
                 let width = packed & 0xffff;
                 let height = packed >> 16;
 
+                proj = Mat4::new_perspective(
+                    width as f32 / height as f32, // aspect ratio
+                    90.,                          // fovy
+                    0.1,                          // znear
+                    100.,                         // zfar
+                );
+
                 (gl.Viewport)(0, 0, width as i32, height as i32);
             }
         }
@@ -395,9 +409,19 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         unsafe {
             (gl.Clear)(ogl::GL_COLOR_BUFFER_BIT | ogl::GL_DEPTH_BUFFER_BIT);
 
-            // TODO: Render things. Triangles maybe?
             (gl.UseProgram)(sérusier_prog);
-            (gl.DrawArrays)(ogl::GL_TRIANGLES, 0, 4 * 6);
+
+            // Set uniforms
+            let u_proj_view = proj * view;
+            (gl.UniformMatrix4fv)(
+                0, // location
+                1, // count
+                0, // transpose?
+                u_proj_view.data.as_slice().as_ptr(),
+            );
+
+            // (gl.DrawArrays)(ogl::GL_TRIANGLES, 0, 4 * 6);
+            (gl.DrawArrays)(ogl::GL_TRIANGLES, 0, 36 * 4);
 
             // Block until rendering finishes and the swapchain presents (??)
             let res = gdi::SwapBuffers(window.h_dc);
