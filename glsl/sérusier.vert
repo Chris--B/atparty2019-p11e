@@ -69,6 +69,7 @@ const uint vert_indices[] = {
 };
 
 layout(location = 0) uniform mat4 uProjView;
+layout(location = 1) uniform float uTime;
 
 layout(location = 0) out vec4 vColor;
 
@@ -90,7 +91,8 @@ void main() {
         vec4(offset,     1.)
     );
 
-    float scale = 1.0;
+    float t = uTime;
+    float scale = 0.5 + 0.5 * (sin(t) + 1.0);
     mat4 model_scale = mat4(
         vec4(scale,    0.,    0.,  0.),
         vec4(0.,    scale,    0.,  0.),

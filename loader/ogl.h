@@ -37,6 +37,7 @@ typedef struct GlFuncs {
 
     // Shader Inputs
     PFNGLUNIFORMMATRIX4FVPROC UniformMatrix4fv;
+    PFNGLUNIFORM1FPROC        Uniform1f;
 
     // Buffers and Presenting
     PFNGLCLEARCOLORPROC     ClearColor;

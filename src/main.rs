@@ -175,6 +175,20 @@ fn check_linkage(&gl: &ogl::GlFuncs, prog: u32, names: &[&str]) {
     }
 }
 
+// Get a number vaguely related to time.
+// It currently loops every 50 seconds on my laptop. ish.
+fn get_time() -> f32 {
+    unsafe {
+        let mut counter = mem::zeroed();
+        winapi::um::profileapi::QueryPerformanceCounter(&mut counter);
+        // Help with precision loss
+        let itime = *counter.QuadPart() % 100_000_000;
+        let seconds = itime / 1_000_000; // ish
+        let subsecs = itime % 1_000_000; // ish
+        seconds as f32 + (subsecs as f32 * 1e-6)
+    }
+}
+
 #[start]
 #[no_mangle]
 fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
@@ -349,7 +363,14 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         &Vec3::new(0., 0., 1.),     // up
     );
 
+    println!("time = {}", get_time());
+
     while keep_running {
+        let time = get_time();
+        if time < 0.001 {
+            // Just to keep track of its pace.
+            println!("time = {}", time);
+        }
         // Win32 boilerplate
         unsafe {
             // Process all outstanding messages from Windows
@@ -419,6 +440,8 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
                 0, // transpose?
                 u_proj_view.data.as_slice().as_ptr(),
             );
+
+            (gl.Uniform1f)(1, time);
 
             // (gl.DrawArrays)(ogl::GL_TRIANGLES, 0, 4 * 6);
             (gl.DrawArrays)(ogl::GL_TRIANGLES, 0, 36 * 4);

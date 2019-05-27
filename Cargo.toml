@@ -33,7 +33,8 @@ features = [
     "libloaderapi",
     "winuser",
     "wingdi",
-    "errhandlingapi"
+    "errhandlingapi",
+    "profileapi",
 ]
 
 [build-dependencies]

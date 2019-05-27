@@ -83,13 +83,14 @@ pub type PFNGLSHADERSOURCEPROC = unsafe extern "system" fn(
     length: *const GLint,
 );
 pub type PFNGLUSEPROGRAMPROC = unsafe extern "system" fn(program: GLuint);
+pub type PFNGLUNIFORM1FPROC =
+    unsafe extern "system" fn(location: GLint, v0: GLfloat);
 pub type PFNGLUNIFORMMATRIX4FVPROC = unsafe extern "system" fn(
     location: GLint,
     count: GLsizei,
     transpose: GLboolean,
     value: *const GLfloat,
 );
-
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct GlFuncs {
@@ -103,9 +104,9 @@ pub struct GlFuncs {
     pub LinkProgram: PFNGLLINKPROGRAMPROC,
     pub UseProgram: PFNGLUSEPROGRAMPROC,
     pub UniformMatrix4fv: PFNGLUNIFORMMATRIX4FVPROC,
-
+    pub Uniform1f: PFNGLUNIFORM1FPROC,
     pub ClearColor: PFNGLCLEARCOLORPROC,
-    pub Clear:      PFNGLCLEARPROC,
+    pub Clear: PFNGLCLEARPROC,
     pub ClearDepth: PFNGLCLEARDEPTHPROC,
     pub DrawArrays: PFNGLDRAWARRAYSPROC,
 
