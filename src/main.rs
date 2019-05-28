@@ -177,16 +177,23 @@ fn check_linkage(&gl: &ogl::GlFuncs, prog: u32, names: &[&str]) {
 
 // Get a number vaguely related to time.
 // It currently loops every 50 seconds on my laptop. ish.
-fn get_time() -> f32 {
+fn get_time() -> f64 {
     unsafe {
         let mut counter = mem::zeroed();
         winapi::um::profileapi::QueryPerformanceCounter(&mut counter);
-        // Help with precision loss
-        let itime = *counter.QuadPart() % 100_000_000;
-        let seconds = itime / 1_000_000; // ish
-        let subsecs = itime % 1_000_000; // ish
-        seconds as f32 + (subsecs as f32 * 1e-6)
+        let itime = *counter.QuadPart();
+        const ONE_SEC: i64 = 10_000_000; // ish
+        let seconds = itime / ONE_SEC;
+        let subsecs = itime % ONE_SEC;
+        seconds as f64 + (subsecs as f64 / ONE_SEC as f64)
     }
+}
+
+fn generate_view_mat(time: f32) -> Mat4 {
+    let eye = Point3::new(10., 10., 1.);
+    let focus = Point3::new(0., 0., -10.);
+
+    Mat4::look_at_rh(&eye, &focus, &Vec3::new(0., 0., 1.))
 }
 
 #[start]
@@ -357,20 +364,10 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         0.1,  // znear
         100., // zfar
     );
-    let mut view = Mat4::look_at_rh(
-        &Point3::new(10., 10., 1.), // eye
-        &Point3::new(0., 0., -10.), // center
-        &Vec3::new(0., 0., 1.),     // up
-    );
 
-    println!("time = {}", get_time());
-
+    let start = get_time();
+    println!("start time = {}", start);
     while keep_running {
-        let time = get_time();
-        if time < 0.001 {
-            // Just to keep track of its pace.
-            println!("time = {}", time);
-        }
         // Win32 boilerplate
         unsafe {
             // Process all outstanding messages from Windows
@@ -426,6 +423,10 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
                 (gl.Viewport)(0, 0, width as i32, height as i32);
             }
         }
+
+        // Update state
+        let time = (get_time() - start) as f32;
+        let view = generate_view_mat(time);
 
         unsafe {
             (gl.Clear)(ogl::GL_COLOR_BUFFER_BIT | ogl::GL_DEPTH_BUFFER_BIT);

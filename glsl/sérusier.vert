@@ -59,6 +59,13 @@ const vec3 shape_offets[4] = {
     vec3( 1.,  1., -0.5),
 };
 
+const float shape_time_scales[] = {
+    1.,
+    3.,
+    5.,
+    7.,
+};
+
 const uint vert_indices[] = {
      0,  1,  2, /**/  0,  2,  3, // Front
      4,  5,  6, /**/  4,  6,  7, // Right
@@ -83,7 +90,6 @@ void main() {
     const uint shape_id = gl_VertexID / VERTS_PER_SHAPE;
 
     vec3 offset = shape_offets[shape_id];
-    offset *= 7.0;
     mat4 model_offset = mat4(
         vec4(1., 0., 0., 0.),
         vec4(0., 1., 0., 0.),
@@ -91,8 +97,8 @@ void main() {
         vec4(offset,     1.)
     );
 
-    float t = uTime;
-    float scale = 0.5 + mix(0.5, 2.5, sin(t) + 1.0);
+    float t = shape_time_scales[shape_id] * uTime;
+    float scale = 0.5 + mix(0.5, 1.5, sin(t) + 1.0);
     mat4 model_scale = mat4(
         vec4(scale,    0.,    0.,  0.),
         vec4(0.,    scale,    0.,  0.),
