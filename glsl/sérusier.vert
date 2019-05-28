@@ -92,7 +92,7 @@ void main() {
     );
 
     float t = uTime;
-    float scale = 0.5 + 0.5 * (sin(t) + 1.0);
+    float scale = 0.5 + mix(0.5, 2.5, sin(t) + 1.0);
     mat4 model_scale = mat4(
         vec4(scale,    0.,    0.,  0.),
         vec4(0.,    scale,    0.,  0.),

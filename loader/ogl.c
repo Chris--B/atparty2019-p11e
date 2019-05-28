@@ -74,5 +74,9 @@ int ogl_load(GlFuncs* pFns)
         pFns->Viewport          = (PFNGLVIEWPORTPROC)           load_fn(hOpenGL, &error, "glViewport");
     #endif
 
+    // lol yolo
+    ((PFNGLENABLEPROC)GetProcAddress(hOpenGL, "glEnable"))(GL_DEPTH_TEST);
+    ((PFNGLDEPTHFUNCPROC)GetProcAddress(hOpenGL, "glDepthFunc"))(GL_LESS);
+
     return error;
 }

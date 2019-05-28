@@ -358,8 +358,8 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         100., // zfar
     );
     let mut view = Mat4::look_at_rh(
-        &Point3::new(10., 10., 2.), // eye
-        &Point3::new(0., 0., 0.),   // center
+        &Point3::new(10., 10., 1.), // eye
+        &Point3::new(0., 0., -10.), // center
         &Vec3::new(0., 0., 1.),     // up
     );
 
