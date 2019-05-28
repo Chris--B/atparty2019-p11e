@@ -359,10 +359,10 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut ret_code: isize = 0;
 
     let mut proj = Mat4::new_perspective(
-        1.0,  // aspect ratio
-        90.,  // fovy
-        0.1,  // znear
-        100., // zfar
+        1.0, // aspect ratio
+        90., // fovy
+        0.1, // znear
+        10., // zfar
     );
 
     let start = get_time();
@@ -416,8 +416,8 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
                 proj = Mat4::new_perspective(
                     width as f32 / height as f32, // aspect ratio
                     90.,                          // fovy
-                    0.1,                          // znear
-                    100.,                         // zfar
+                    1.,                           // znear
+                    20.,                          // zfar
                 );
 
                 (gl.Viewport)(0, 0, width as i32, height as i32);
