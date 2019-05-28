@@ -189,9 +189,9 @@ fn get_time() -> f64 {
     }
 }
 
-fn generate_view_mat(time: f32) -> Mat4 {
-    let eye = Point3::new(10., 10., 1.);
-    let focus = Point3::new(0., 0., -10.);
+fn generate_view_mat(_time: f32) -> Mat4 {
+    let eye = Point3::new(10., 1., 7.);
+    let focus = Point3::new(0., 0., -5.);
 
     Mat4::look_at_rh(&eye, &focus, &Vec3::new(0., 0., 1.))
 }
@@ -362,7 +362,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         1.0, // aspect ratio
         90., // fovy
         0.1, // znear
-        10., // zfar
+        30., // zfar
     );
 
     let start = get_time();
@@ -417,7 +417,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
                     width as f32 / height as f32, // aspect ratio
                     90.,                          // fovy
                     1.,                           // znear
-                    20.,                          // zfar
+                    30.,                          // zfar
                 );
 
                 (gl.Viewport)(0, 0, width as i32, height as i32);
