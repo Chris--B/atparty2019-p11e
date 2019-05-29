@@ -9,34 +9,58 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) uniform float uTime;
 
 const float PI = 3.1415926535897932384626433832795;
-const float PI_2 = 1.57079632679489661923;
-const float PI_4 = 0.785398163397448309616;
 
-struct Light {
-    vec3 pos;
-    vec3 color;
-};
+vec2 circle_5(int fifth) {
+    float t = uTime - fifth * (2.*PI) /5;
+    return 10. * vec2(sin(t), cos(t));
+}
 
-vec3 circle_pos(float t) {
-    return -vec3(3. * sin(3. * t), 3. * cos(3. * t), 0.);
+vec3 rgb(int r, int g, int b) {
+    return vec3(r, g, b) / 255.;
+}
+
+vec3 color_z(float z) {
+    // Normalize into [0, 1].
+    float zz = (z + 10.) / 20.;
+    vec3 palette[] = {
+        rgb(  2,  86, 208), // Dark blue
+        rgb(  0, 140,  81), // Blue-green
+        rgb(  0, 140,  54), // Dark green
+        rgb(255, 208,  10), // Lighter orange
+        rgb(255, 160,  15), // Darkish orange
+        rgb(255, 70,   15), // Red orange
+    };
+
+    float i_f  = zz * palette.length();
+    int   i_lo = clamp(int(i_f), 0, palette.length());
+    int   i_hi = clamp(int(i_f + 0.5), 0, palette.length());
+
+    return mix(palette[i_lo], palette[i_hi], fract(i_f));
 }
 
 void main() {
-
-    Light lights[] = {
-        Light(circle_pos(uTime - 0*PI_4), vec3( 1.,  0.,  0.)),
-        Light(circle_pos(uTime - 1*PI_4), vec3( 0.,  1.,  0.)),
-        Light(circle_pos(uTime - 2*PI_4), vec3( 0.,  0.,  1.)),
-        Light(circle_pos(uTime - 3*PI_4), vec3(0.7, 0.7, 0.7)),
-    };
-
     vec3 diffuse = vec3(0.);
-    for (int i = 0; i < 4; i += 1) {
-        float a = 30. / (1. + dot(lights[i].pos - vWorldPos, lights[i].pos - vWorldPos));
-        vec3 l = normalize(lights[i].pos - vWorldPos);
-        vec3 n = normalize(vNormal);
-        float discord = dot(n, l);
-        diffuse += a * lights[i].color * max(discord, 0.0);
+
+    for (float zz = -10.; zz < 11.; zz += 2.) {
+        for (int i = 0; i < 5; i += 1) {
+            vec3 l_pos = vec3(circle_5(i), zz);
+            vec3 world_pos = vWorldPos;
+            vec3 normal = vNormal;
+            if (gl_PrimitiveID <= 12) {
+                normal    = -normalize(world_pos);
+                world_pos = 20. * -normal;
+            }
+            vec3 delta = l_pos - world_pos;
+            delta.z *= 2; // warp space time
+
+            float dist = dot(delta, delta);
+            float a = 10. / (1. + dist);
+
+            vec3 l = normalize(l_pos - world_pos);
+            vec3 n = normalize(normal);
+            float discord = dot(n, l);
+            diffuse += a * color_z(zz) * max(discord, 0.0);
+        }
     }
 
     fragColor = vec4(vColor * diffuse, 1.);

@@ -362,7 +362,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         1.0, // aspect ratio
         90., // fovy
         0.1, // znear
-        30., // zfar
+        50., // zfar
     );
 
     let start = get_time();
@@ -417,7 +417,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
                     width as f32 / height as f32, // aspect ratio
                     90.,                          // fovy
                     1.,                           // znear
-                    30.,                          // zfar
+                    50.,                          // zfar
                 );
 
                 (gl.Viewport)(0, 0, width as i32, height as i32);
@@ -445,7 +445,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
             (gl.Uniform1f)(1, time);
 
             // (gl.DrawArrays)(ogl::GL_TRIANGLES, 0, 4 * 6);
-            (gl.DrawArrays)(ogl::GL_TRIANGLES, 0, 36 * 4);
+            (gl.DrawArrays)(ogl::GL_TRIANGLES, 0, 36 * 66);
 
             // Block until rendering finishes and the swapchain presents (??)
             let res = gdi::SwapBuffers(window.h_dc);
