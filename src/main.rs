@@ -406,6 +406,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
 
         // If we're resizing, do the GL thing
         #[cfg(feature = "dev_build")]
+        // TODO: Fullscreen by default!
         unsafe {
             let packed: u32 =
                 PENDING_RESIZE.swap(core::i32::MAX, Ordering::SeqCst) as u32;
