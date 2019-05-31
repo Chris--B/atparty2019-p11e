@@ -48,11 +48,12 @@ void main() {
             vec3 normal = vNormal;
             if (gl_PrimitiveID <= 12) {
                 normal    = -normalize(world_pos);
-                world_pos = 20. * -normal;
+                world_pos = 10. * -normal;
             }
             vec3 delta = l_pos - world_pos;
-            delta.z *= 2; // warp space time
-
+            if (gl_PrimitiveID > 12) {
+                delta.z *= 2; // warp space time
+            }
             float dist = dot(delta, delta);
             float a = 10. / (1. + dist);
 
