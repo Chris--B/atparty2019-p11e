@@ -13,6 +13,7 @@ use core::{
     ptr,
     sync::atomic::{
         AtomicI32,
+        AtomicBool,
         Ordering,
     },
 };
@@ -54,7 +55,8 @@ type Mat4 = nalgebra::Matrix4<f32>;
 type Point3 = nalgebra::Point3<f32>;
 type Vec3 = nalgebra::Vector3<f32>;
 
-static PENDING_RESIZE: AtomicI32 = AtomicI32::new(-1);
+static PENDING_RESIZE: AtomicI32  = AtomicI32::new(-1);
+static PAUSED:         AtomicBool = AtomicBool::new(false);
 
 unsafe extern "system" fn wnd_proc(
     h_wnd: windef::HWND,
@@ -74,6 +76,9 @@ unsafe extern "system" fn wnd_proc(
                     user::PostQuitMessage(0);
                     return 0;
                 },
+                user::VK_SPACE => {
+                    PAUSED.fetch_xor(true, Ordering::SeqCst);
+                }
                 _ => {},
             }
         },
@@ -404,6 +409,10 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
             break;
         }
 
+        if PAUSED.load(Ordering::SeqCst) {
+            continue;
+        }
+
         // If we're resizing, do the GL thing
         #[cfg(feature = "dev_build")]
         // TODO: Fullscreen by default!
@@ -417,7 +426,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
                 proj = Mat4::new_perspective(
                     width as f32 / height as f32, // aspect ratio
                     90.,                          // fovy
-                    1.,                           // znear
+                    0.1,                           // znear
                     50.,                          // zfar
                 );
 
