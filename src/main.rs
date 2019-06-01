@@ -228,9 +228,19 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         };
         user::RegisterClassA(&wc);
 
+        let mut dm_screen_settings = mem::zeroed();
+        let ok = user::EnumDisplaySettingsA(ptr::null(), user::ENUM_CURRENT_SETTINGS, &mut dm_screen_settings);
+        if ok == 0 {
+            abort!("EnumDisplaySettingsA() failed");
+        }
+        let ret = user::ChangeDisplaySettingsA(&mut dm_screen_settings, user::CDS_FULLSCREEN);
+        if ret != user::DISP_CHANGE_SUCCESSFUL {
+            abort!("ChangeDisplaySettingsA() failed with: {}", ret);
+        }
+
         // Create Window handle
-        let ex_style = user::WS_EX_APPWINDOW | user::WS_EX_WINDOWEDGE;
-        let style = user::WS_OVERLAPPEDWINDOW | user::WS_VISIBLE;
+        let ex_style = 0;
+        let style = user::WS_POPUP | user::WS_VISIBLE;
         h_wnd = user::CreateWindowExA(
             ex_style,        // DWORD     dwExStyle
             THING_NAME,      // LPCSTR    lpClassName
@@ -238,8 +248,8 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
             style,           // DWORD     dwStyle
             0,               // int       X
             0,               // int       Y
-            800,             // int       nWidth
-            600,             // int       nHeight
+            1920,             // int       nWidth
+            1080,             // int       nHeight
             ptr::null_mut(), // HWND      hWndParent
             ptr::null_mut(), // HMENU     hMenu
             ptr::null_mut(), // HINSTANCE hInstance
@@ -281,7 +291,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
             );
         }
 
-        // user::ShowCursor(0);
+        user::ShowCursor(0);
 
         window = Window {
             h_wnd,
