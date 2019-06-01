@@ -195,8 +195,9 @@ fn get_time() -> f64 {
 }
 
 fn generate_view_mat(_time: f32) -> Mat4 {
-    let eye = Point3::new(10., 1., 7.);
-    let focus = Point3::new(0., 0., -5.);
+    // let eye = Point3::new(10., 1., 7.);
+    let eye   = Point3::new( -7., -7.,  0.);
+    let focus = Point3::new(  0.,  0., -5.);
 
     Mat4::look_at_rh(&eye, &focus, &Vec3::new(0., 0., 1.))
 }
@@ -465,7 +466,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
             (gl.Uniform1f)(1, time);
 
             // (gl.DrawArrays)(ogl::GL_TRIANGLES, 0, 4 * 6);
-            (gl.DrawArrays)(ogl::GL_TRIANGLES, 0, 36 * 66);
+            (gl.DrawArrays)(ogl::GL_TRIANGLES, 0, 36 * 65);
 
             // Block until rendering finishes and the swapchain presents (??)
             let res = gdi::SwapBuffers(window.h_dc);

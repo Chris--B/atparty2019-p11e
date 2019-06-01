@@ -3,15 +3,7 @@
 const float PI = 3.1415926535897932384626433832795;
 
 /// ==== Vertex Data
-
-/// Triangular Pyriamid
-/// See: https://en.wikipedia.org/wiki/Tetrahedron
-const vec3 positions[] = {
-    // vec4(-1.,  0., -1. / 1.41421356237, 1.),
-    // vec4( 1.,  0., -1. / 1.41421356237, 1.),
-    // vec4( 0., -1.,  1. / 1.41421356237, 1.),
-    // vec4( 0.,  1.,  1. / 1.41421356237, 1.),
-
+const vec3 c_pos[] = {
     // Front
     vec3(-1.0,  1.0, -1.0),
     vec3( 1.0,  1.0, -1.0),
@@ -49,7 +41,7 @@ const vec3 positions[] = {
     vec3(-1.0,  1.0, -1.0),
 };
 
-const vec3 vert_normals[] = {
+const vec3 c_norm[] = {
     // Front
     vec3( 0.,  1.,  0.),
 
@@ -69,7 +61,7 @@ const vec3 vert_normals[] = {
     vec3( 0.,  0., -1.),
 };
 
-const uint vert_indices[] = {
+const uint c_index[] = {
      0,  1,  2, /**/  0,  2,  3, // Front
      4,  5,  6, /**/  4,  6,  7, // Right
      8,  9, 10, /**/  8, 10, 11, // Back
@@ -78,80 +70,94 @@ const uint vert_indices[] = {
     20, 21, 22, /**/ 20, 22, 23, // Bottom
 };
 
+/// https://en.wikipedia.org/wiki/Tetrahedron
+const vec3 t_pos[] = {
+    vec3(-1.,  0., -1. / 1.41421356237),
+    vec3( 1.,  0., -1. / 1.41421356237),
+    vec3( 0., -1.,  1. / 1.41421356237),
+    vec3( 0.,  1.,  1. / 1.41421356237),
+};
+
+const uint t_index[] = {
+    0, 1, 2,
+    0, 3, 2,
+    0, 1, 3,
+    0, 2, 1,
+};
+
 /// ==== Shape Data
 
 const vec3 shape_offets[] = {
-    vec3( 0.0,  0.0,  0.0), // Skybox
-    // vec3(-0.5, -0.5,  0.5),
-    // vec3(-0.5,  0.5, -0.5),
-    // vec3( 0.5, -0.5,  0.5),
-    // vec3( 0.5,  0.5, -0.5),
+    // Skybox - Don't move it
+    vec3( 0.0,  0.0,  0.0),
 
-vec3(-2, -2, -2),
-vec3(-2, -2, -1),
-vec3(-2, -2, 0),
-vec3(-2, -2, 1),
-vec3(-2, -1, -2),
-vec3(-2, -1, -1),
-vec3(-2, -1, 0),
-vec3(-2, -1, 1),
-vec3(-2, 0, -2),
-vec3(-2, 0, -1),
-vec3(-2, 0, 0),
-vec3(-2, 0, 1),
-vec3(-2, 1, -2),
-vec3(-2, 1, -1),
-vec3(-2, 1, 0),
-vec3(-2, 1, 1),
-vec3(-1, -2, -2),
-vec3(-1, -2, -1),
-vec3(-1, -2, 0),
-vec3(-1, -2, 1),
-vec3(-1, -1, -2),
-vec3(-1, -1, -1),
-vec3(-1, -1, 0),
-vec3(-1, -1, 1),
-vec3(-1, 0, -2),
-vec3(-1, 0, -1),
-vec3(-1, 0, 0),
-vec3(-1, 0, 1),
-vec3(-1, 1, -2),
-vec3(-1, 1, -1),
-vec3(-1, 1, 0),
-vec3(-1, 1, 1),
-vec3(0, -2, -2),
-vec3(0, -2, -1),
-vec3(0, -2, 0),
-vec3(0, -2, 1),
-vec3(0, -1, -2),
-vec3(0, -1, -1),
-vec3(0, -1, 0),
-vec3(0, -1, 1),
-vec3(0, 0, -2),
-vec3(0, 0, -1),
-vec3(0, 0, 0),
-vec3(0, 0, 1),
-vec3(0, 1, -2),
-vec3(0, 1, -1),
-vec3(0, 1, 0),
-vec3(0, 1, 1),
-vec3(1, -2, -2),
-vec3(1, -2, -1),
-vec3(1, -2, 0),
-vec3(1, -2, 1),
-vec3(1, -1, -2),
-vec3(1, -1, -1),
-vec3(1, -1, 0),
-vec3(1, -1, 1),
-vec3(1, 0, -2),
-vec3(1, 0, -1),
-vec3(1, 0, 0),
-vec3(1, 0, 1),
-vec3(1, 1, -2),
-vec3(1, 1, -1),
-vec3(1, 1, 0),
-vec3(1, 1, 1),
+    // Everything else - 64 of them
+    vec3(-2, -2, -2),
+    vec3(-2, -2, -1),
+    vec3(-2, -2, 0),
+    vec3(-2, -2, 1),
+    vec3(-2, -1, -2),
+    vec3(-2, -1, -1),
+    vec3(-2, -1, 0),
+    vec3(-2, -1, 1),
+    vec3(-2, 0, -2),
+    vec3(-2, 0, -1),
+    vec3(-2, 0, 0),
+    vec3(-2, 0, 1),
+    vec3(-2, 1, -2),
+    vec3(-2, 1, -1),
+    vec3(-2, 1, 0),
+    vec3(-2, 1, 1),
+    vec3(-1, -2, -2),
+    vec3(-1, -2, -1),
+    vec3(-1, -2, 0),
+    vec3(-1, -2, 1),
+    vec3(-1, -1, -2),
+    vec3(-1, -1, -1),
+    vec3(-1, -1, 0),
+    vec3(-1, -1, 1),
+    vec3(-1, 0, -2),
+    vec3(-1, 0, -1),
+    vec3(-1, 0, 0),
+    vec3(-1, 0, 1),
+    vec3(-1, 1, -2),
+    vec3(-1, 1, -1),
+    vec3(-1, 1, 0),
+    vec3(-1, 1, 1),
+    vec3(0, -2, -2),
+    vec3(0, -2, -1),
+    vec3(0, -2, 0),
+    vec3(0, -2, 1),
+    vec3(0, -1, -2),
+    vec3(0, -1, -1),
+    vec3(0, -1, 0),
+    vec3(0, -1, 1),
+    vec3(0, 0, -2),
+    vec3(0, 0, -1),
+    vec3(0, 0, 0),
+    vec3(0, 0, 1),
+    vec3(0, 1, -2),
+    vec3(0, 1, -1),
+    vec3(0, 1, 0),
+    vec3(0, 1, 1),
+    vec3(1, -2, -2),
+    vec3(1, -2, -1),
+    vec3(1, -2, 0),
+    vec3(1, -2, 1),
+    vec3(1, -1, -2),
+    vec3(1, -1, -1),
+    vec3(1, -1, 0),
+    vec3(1, -1, 1),
+    vec3(1, 0, -2),
+    vec3(1, 0, -1),
+    vec3(1, 0, 0),
+    vec3(1, 0, 1),
+    vec3(1, 1, -2),
+    vec3(1, 1, -1),
+    vec3(1, 1, 0),
+    vec3(1, 1, 1),
 
+    // "Random"
     // vec3(0.7191511282382121, 0.47436989500908855, 0.7451361058713958),
     // vec3(0.47436989500908855, 0.7451361058713958, 0.703488576674201),
     // vec3(0.7451361058713958, 0.703488576674201, 0.9481789980549938),
@@ -196,38 +202,179 @@ vec3(1, 1, 1),
     // vec3(0.934725066004673, 0.9692061073213116, 0.6466875450611609),
 };
 
-const float shape_time_scales[] = {
-    0., // Skybox
-    3. / 2.,
-    5. / 2.,
-    7. / 2.,
-    9. / 2.,
+const vec3 shape_scales[] = {
+    vec3(15.),
+
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+    vec3(0.8, 0.8, 0.8),
+};
+
+const float shape_rots[] = {
+    0.,
+
+     00.,
+     10.,
+     20.,
+     30.,
+     40.,
+     50.,
+     60.,
+     70.,
+     80.,
+     90.,
+    100.,
+    110.,
+    120.,
+    130.,
+    140.,
+    150.,
+    160.,
+    170.,
+    180.,
+    190.,
+    200.,
+    210.,
+    220.,
+    230.,
+    240.,
+    250.,
+    260.,
+    270.,
+    280.,
+    290.,
+    300.,
+    310.,
+    320.,
+    330.,
+    340.,
+    350.,
+    360.,
+    370.,
+    380.,
+    390.,
+    400.,
+    410.,
+    420.,
+    430.,
+    440.,
+    450.,
+    460.,
+    470.,
+    480.,
+    490.,
+    500.,
+    510.,
+    520.,
+    530.,
+    540.,
+    550.,
+    560.,
+    570.,
+    580.,
+    590.,
+    600.,
+    610.,
+    620.,
+    630.,
 };
 
 layout(location = 0) uniform mat4  uProjView;
 layout(location = 1) uniform float uTime;
 
-layout(location = 0) out vec3 vColor;
+layout(location = 0) out vec4 vRot;
 layout(location = 1) out vec3 vWorldPos;
 layout(location = 2) out vec3 vNormal;
 
+vec4 make_rot(vec3 axis, float degrees) {
+    const float radians = degrees * PI / 180.;
+    const float s = sin(0.5 * radians);
+    const float c = cos(0.5 * radians);
+    return vec4(s * normalize(axis), c);
+}
+
+vec4 qmul(vec4 q1, vec4 q2) {
+    return vec4(
+        (q2.xyz * q1.w) + (q1.xyz * q2.w) + cross(q1.xyz, q2.xyz),
+        (q1.w   * q2.w)                   - dot(q1.xyz, q2.xyz)
+    );
+}
+
+vec3 rotate_vector(vec3 v, vec4 r) {
+    vec4 r_c = r * vec4(-1, -1, -1, 1);
+    return qmul(r, qmul(vec4(v, 0), r_c)).xyz;
+}
+
 void main() {
-    const uint VERTS_PER_SHAPE = vert_indices.length();
-    const uint index  = vert_indices[gl_VertexID % VERTS_PER_SHAPE];
-    const uint shape_id = gl_VertexID / VERTS_PER_SHAPE;
+    const uint VERTS_PER_SHAPE = c_index.length();
+    const uint index           = c_index[gl_VertexID % VERTS_PER_SHAPE];
+    uint shape_id        = gl_VertexID / VERTS_PER_SHAPE;
 
-    vColor = vec3(0.8, 0.8, 0.8);
+    vec3  offset = 4. * shape_offets[shape_id];
+    vec3  scale  = shape_scales[shape_id];
+    vec4  rot    = make_rot(vec3(1., 1., 0.), shape_rots[shape_id]);
 
-    float t      = shape_time_scales[shape_id % shape_time_scales.length()] * uTime;
-    vec3  offset = shape_offets[shape_id];
-    vec3  scale  = vec3(0.8, 0.8, 0.8);
-
-    if (shape_id == 0) {
-        offset = vec3(0);
-        scale = vec3(15.);
-    } else {
-        offset *= 4.;
-    }
     const mat4 model_offset = mat4(
         vec4(1., 0., 0., 0.),
         vec4(0., 1., 0., 0.),
@@ -245,12 +392,13 @@ void main() {
     const mat4 model = model_offset * model_scale;
 
     // Per vertex, regardless of shape
-    const vec4 pos = vec4(positions[index], 1.0);
+    vRot = rot;
+    vec4 pos = vec4(rotate_vector(c_pos[index], rot), 1.);
     gl_Position = uProjView * model * pos;
     vWorldPos = (model * pos).xyz;
 
     // Per face - each face is defined with 4 index values, 6 faces makes a shape
-    vec3 normal = (model * vec4(vert_normals[(index / 4) % 6], 0.)).xyz;
+    vec3 normal = (model * vec4(c_norm[(index / 4) % 6], 0.)).xyz;
     if (shape_id == 0) {
         normal = -normal;
     }
