@@ -195,11 +195,28 @@ fn get_time() -> f64 {
     }
 }
 
-fn generate_view_mat(_time: f32) -> Mat4 {
-    // let eye = Point3::new(10., 1., 7.);
-    let eye = Point3::new(-7., -7., 0.);
-    let focus = Point3::new(0., 0., -5.);
+fn generate_view_mat(time: f32) -> Mat4 {
+    // Sorted by [t0, t1] pairs
+    const EYES: [(f32, f32, [f32; 3], [f32; 3]); 2] = [
+        // t0, t1, eye0, eye1
+        (0., 2., [-7., -7., -7.], [-7., -7., -2.]),
+        (2., 4., [-7., 1., 7.], [7., 1., 7.]),
+    ];
+    let time = time % EYES.last().unwrap().1;
 
+    let mut eye = Point3::new(15., 15., 15.);
+    let t;
+    for datum in &EYES {
+        let (t0, t1, eye0, eye1) = *datum;
+        if t0 <= time && time <= t1 {
+            let eye0 = Vec3::from(eye0);
+            let eye1 = Vec3::from(eye1);
+            t = (time - t0) / (t1 - t0);
+            eye = Point3::from(t * eye0 + (1. - t) * eye1);
+            break;
+        }
+    }
+    let focus = Point3::new(0., 0., -5.);
     Mat4::look_at_rh(&eye, &focus, &Vec3::new(0., 0., 1.))
 }
 
@@ -407,10 +424,10 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut ret_code: isize = 0;
 
     let mut proj = Mat4::new_perspective(
-        1.0, // aspect ratio
-        90., // fovy
-        0.1, // znear
-        50., // zfar
+        1.0,  // aspect ratio
+        90.,  // fovy
+        0.1,  // znear
+        100., // zfar
     );
 
     let start = get_time();
@@ -470,7 +487,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
                     width as f32 / height as f32, // aspect ratio
                     90.,                          // fovy
                     0.1,                          // znear
-                    50.,                          // zfar
+                    100.,                         // zfar
                 );
 
                 (gl.Viewport)(0, 0, width as i32, height as i32);
