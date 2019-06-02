@@ -182,7 +182,7 @@ const vec3 shape_offets[65] = {
 };
 
 const vec3 shape_scales[65] = {
-    vec3(15.),
+    vec3(30.),
 
     vec3(0.8, 0.8, 0.8),
     vec3(0.8, 0.8, 0.8),
@@ -370,18 +370,18 @@ void main() {
         index    = t_index[gl_VertexID % VERTS_PER_SHAPE];
     }
 
-    vec3  offset = 4. * shape_offets[shape_id];
-    vec3  scale  = shape_scales[shape_id];
+    vec3 offset = 4. * shape_offets[shape_id];
+    vec3 scale  = shape_scales[shape_id];
     if (!is_cube()) {
         scale *= sqrt(2);
     }
-    vec4  rot    = make_rot(vec3(1., 1., 0.), shape_rots[shape_id]);
+    vec4 rot = make_rot(vec3(1., 1., 0.), shape_rots[shape_id]);
 
     const mat4 model_offset = mat4(
-        vec4(1., 0., 0., 0.),
-        vec4(0., 1., 0., 0.),
-        vec4(0., 0., 1., 0.),
-        vec4(offset,     1.)
+        vec4(1.,  0.,  0.,  0.),
+        vec4(0.,  1.,  0.,  0.),
+        vec4(0.,  0.,  1., 0.),
+        vec4(      offset,  1.)
     );
 
     const mat4 model_scale = mat4(

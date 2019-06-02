@@ -200,12 +200,14 @@ fn generate_view_mat(time: f32) -> Mat4 {
     // Sorted by [t0, t1] pairs
     const EYES: [(f32, f32, [f32; 3], [f32; 3]); 2] = [
         // t0, t1, eye0, eye1
-        (0., 2., [-7., -7., -7.], [-7., -7., -2.]),
-        (2., 4., [-7., 1., 7.], [7., 1., 7.]),
+        // (0., 2., [-7., -7., -7.], [-7., -7., -2.]),
+        // (2., 4., [-7., 1., 7.], [7., 1., 7.]),
+        (4., 14., [30., -30., 20.], [-30., -30., 20.]),
+        (14., 24., [-30., -30., 20.], [-30., 30., 20.]),
     ];
     let time = time % EYES.last().unwrap().1;
 
-    let mut eye = Point3::new(15., 15., 15.);
+    let mut eye = Point3::new(30., 30., 30.);
     let t;
     for datum in &EYES {
         let (t0, t1, eye0, eye1) = *datum;
@@ -218,7 +220,7 @@ fn generate_view_mat(time: f32) -> Mat4 {
         }
     }
     let focus = Point3::new(0., 0., -5.);
-    Mat4::look_at_rh(&eye, &focus, &Vec3::new(0., 0., 1.))
+    Mat4::look_at_rh(&eye, &focus, &Vec3::new(0., 0., -1.))
 }
 
 #[start]
@@ -426,10 +428,10 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut ret_code: isize = 0;
 
     let mut proj = Mat4::new_perspective(
-        1.0,  // aspect ratio
-        FOV,  // fovy
-        0.1,  // znear
-        100., // zfar
+        1.0, // aspect ratio
+        FOV, // fovy
+        0.1, // znear
+        1e3, // zfar
     );
 
     let start = get_time();
@@ -489,7 +491,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
                     width as f32 / height as f32, // aspect ratio
                     FOV,                          // fovy
                     0.1,                          // znear
-                    100.,                         // zfar
+                    1e3,                          // zfar
                 );
 
                 (gl.Viewport)(0, 0, width as i32, height as i32);
