@@ -55,7 +55,8 @@ type Mat4 = nalgebra::Matrix4<f32>;
 type Point3 = nalgebra::Point3<f32>;
 type Vec3 = nalgebra::Vector3<f32>;
 
-const FOV: f32 = 100.;
+/// Field of View in screen-space y coordinates, in RADIANS
+const FOV: f32 = 45. * 3.14 / 180.;
 static PENDING_RESIZE: AtomicI32 = AtomicI32::new(-1);
 static PAUSED: AtomicBool = AtomicBool::new(false);
 
@@ -220,7 +221,7 @@ fn generate_view_mat(time: f32) -> Mat4 {
         }
     }
     let focus = Point3::new(0., 0., -5.);
-    Mat4::look_at_rh(&eye, &focus, &Vec3::new(0., 0., -1.))
+    Mat4::look_at_rh(&eye, &focus, &Vec3::new(0., 0., 1.))
 }
 
 #[start]
