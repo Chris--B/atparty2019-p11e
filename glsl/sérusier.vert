@@ -3,7 +3,7 @@
 const float PI = 3.1415926535897932384626433832795;
 
 /// ==== Vertex Data
-const vec3 c_pos[] = {
+const vec3 c_pos[24] = {
     // +y       Front
     vec3(-1.,  1., -1.),
     vec3(-1.,  1.,  1.),
@@ -41,7 +41,7 @@ const vec3 c_pos[] = {
     vec3( 1., -1., -1.),
 };
 
-const uint c_index[] = {
+const uint c_index[36] = {
      0,  1,  2, /**/  0,  2,  3, // Front
      4,  5,  6, /**/  4,  6,  7, // Right
      8,  9, 10, /**/  8, 10, 11, // Back
@@ -51,14 +51,14 @@ const uint c_index[] = {
 };
 
 /// https://en.wikipedia.org/wiki/Tetrahedron
-const vec3 t_pos[] = {
+const vec3 t_pos[4] = {
     vec3(-1.,  0., -1. / 1.41421356237),
     vec3( 1.,  0., -1. / 1.41421356237),
     vec3( 0., -1.,  1. / 1.41421356237),
     vec3( 0.,  1.,  1. / 1.41421356237),
 };
 
-const uint t_index[] = {
+const uint t_index[12] = {
     0, 1, 2,
     0, 3, 2,
     0, 1, 3,
