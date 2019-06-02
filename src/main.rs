@@ -12,8 +12,8 @@ use core::{
     mem,
     ptr,
     sync::atomic::{
-        AtomicI32,
         AtomicBool,
+        AtomicI32,
         Ordering,
     },
 };
@@ -55,8 +55,8 @@ type Mat4 = nalgebra::Matrix4<f32>;
 type Point3 = nalgebra::Point3<f32>;
 type Vec3 = nalgebra::Vector3<f32>;
 
-static PENDING_RESIZE: AtomicI32  = AtomicI32::new(-1);
-static PAUSED:         AtomicBool = AtomicBool::new(false);
+static PENDING_RESIZE: AtomicI32 = AtomicI32::new(-1);
+static PAUSED: AtomicBool = AtomicBool::new(false);
 
 unsafe extern "system" fn wnd_proc(
     h_wnd: windef::HWND,
@@ -78,7 +78,7 @@ unsafe extern "system" fn wnd_proc(
                 },
                 user::VK_SPACE => {
                     PAUSED.fetch_xor(true, Ordering::SeqCst);
-                }
+                },
                 _ => {},
             }
         },
@@ -196,8 +196,8 @@ fn get_time() -> f64 {
 
 fn generate_view_mat(_time: f32) -> Mat4 {
     // let eye = Point3::new(10., 1., 7.);
-    let eye   = Point3::new( -7., -7.,  0.);
-    let focus = Point3::new(  0.,  0., -5.);
+    let eye = Point3::new(-7., -7., 0.);
+    let focus = Point3::new(0., 0., -5.);
 
     Mat4::look_at_rh(&eye, &focus, &Vec3::new(0., 0., 1.))
 }
@@ -230,11 +230,18 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         user::RegisterClassA(&wc);
 
         let mut dm_screen_settings = mem::zeroed();
-        let ok = user::EnumDisplaySettingsA(ptr::null(), user::ENUM_CURRENT_SETTINGS, &mut dm_screen_settings);
+        let ok = user::EnumDisplaySettingsA(
+            ptr::null(),
+            user::ENUM_CURRENT_SETTINGS,
+            &mut dm_screen_settings,
+        );
         if ok == 0 {
             abort!("EnumDisplaySettingsA() failed");
         }
-        let ret = user::ChangeDisplaySettingsA(&mut dm_screen_settings, user::CDS_FULLSCREEN);
+        let ret = user::ChangeDisplaySettingsA(
+            &mut dm_screen_settings,
+            user::CDS_FULLSCREEN,
+        );
         if ret != user::DISP_CHANGE_SUCCESSFUL {
             abort!("ChangeDisplaySettingsA() failed with: {}", ret);
         }
@@ -249,8 +256,8 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
             style,           // DWORD     dwStyle
             0,               // int       X
             0,               // int       Y
-            1920,             // int       nWidth
-            1080,             // int       nHeight
+            1920,            // int       nWidth
+            1080,            // int       nHeight
             ptr::null_mut(), // HWND      hWndParent
             ptr::null_mut(), // HMENU     hMenu
             ptr::null_mut(), // HINSTANCE hInstance
@@ -437,7 +444,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
                 proj = Mat4::new_perspective(
                     width as f32 / height as f32, // aspect ratio
                     90.,                          // fovy
-                    0.1,                           // znear
+                    0.1,                          // znear
                     50.,                          // zfar
                 );
 
