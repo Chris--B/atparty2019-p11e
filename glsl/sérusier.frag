@@ -62,10 +62,6 @@ void main() {
     vec3 diffuse     = vec3(0.);
 
     for (int i = 0; i < 5; i += 1) {
-        if (i % 2 == 1) {
-            // continue;
-        }
-
         for (float zz = -10.; zz < 11.; zz += 2.) {
             if (light_count > light_cap) {
                 break;

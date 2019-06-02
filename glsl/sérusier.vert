@@ -41,26 +41,6 @@ const vec3 c_pos[] = {
     vec3(-1.0,  1.0, -1.0),
 };
 
-const vec3 c_norm[] = {
-    // Front
-    vec3( 0.,  1.,  0.),
-
-    // Right
-    vec3( 1.,  0.,  0.),
-
-    // Back
-    vec3( 0., -1.,  0.),
-
-    // Left
-    vec3(-1.,  0.,  0.),
-
-    // Top
-    vec3( 0.,  0.,  1.),
-
-    // Bottom
-    vec3( 0.,  0., -1.),
-};
-
 const uint c_index[] = {
      0,  1,  2, /**/  0,  2,  3, // Front
      4,  5,  6, /**/  4,  6,  7, // Right
@@ -86,8 +66,7 @@ const uint t_index[] = {
 };
 
 /// ==== Shape Data
-
-const vec3 shape_offets[] = {
+const vec3 shape_offets[65] = {
     // Skybox - Don't move it
     vec3( 0.0,  0.0,  0.0),
 
@@ -202,7 +181,7 @@ const vec3 shape_offets[] = {
     // vec3(0.934725066004673, 0.9692061073213116, 0.6466875450611609),
 };
 
-const vec3 shape_scales[] = {
+const vec3 shape_scales[65] = {
     vec3(15.),
 
     vec3(0.8, 0.8, 0.8),
@@ -271,7 +250,7 @@ const vec3 shape_scales[] = {
     vec3(0.8, 0.8, 0.8),
 };
 
-const float shape_rots[] = {
+const float shape_rots[65] = {
     0.,
 
      00.,
@@ -347,6 +326,16 @@ layout(location = 0) out vec4 vRot;
 layout(location = 1) out vec3 vWorldPos;
 layout(location = 2) out vec3 vNormal;
 
+#define CALC_NORMAL(OUTPUT, VERT_ID, POSITIONS, INDICES)                       \
+    {                                                                          \
+        const uint vi0 = (VERT_ID) - ((VERT_ID) % 3);                          \
+        const vec3 v0  = POSITIONS[INDICES[(vi0 + 0) % INDICES.length()]];     \
+        const vec3 v1  = POSITIONS[INDICES[(vi0 + 1) % INDICES.length()]];     \
+        const vec3 v2  = POSITIONS[INDICES[(vi0 + 2) % INDICES.length()]];     \
+                                                                               \
+        OUTPUT = cross(v1 - v0, v2 - v1);                                      \
+    }
+
 vec4 make_rot(vec3 axis, float degrees) {
     const float radians = degrees * PI / 180.;
     const float s = sin(0.5 * radians);
@@ -369,7 +358,7 @@ vec3 rotate_vector(vec3 v, vec4 r) {
 void main() {
     const uint VERTS_PER_SHAPE = c_index.length();
     const uint index           = c_index[gl_VertexID % VERTS_PER_SHAPE];
-    uint shape_id        = gl_VertexID / VERTS_PER_SHAPE;
+    uint shape_id              = gl_VertexID / VERTS_PER_SHAPE;
 
     vec3  offset = 4. * shape_offets[shape_id];
     vec3  scale  = shape_scales[shape_id];
@@ -398,11 +387,12 @@ void main() {
     vWorldPos = (model * pos).xyz;
 
     // Per face - each face is defined with 4 index values, 6 faces makes a shape
-    vec3 normal = (model * vec4(c_norm[(index / 4) % 6], 0.)).xyz;
+    vec3 normal = vec3(1., 0., 1.);
+    CALC_NORMAL(normal, gl_VertexID, c_pos, c_index);
+    normal = normalize(normal);
     if (shape_id == 0) {
         normal = -normal;
     }
-    vNormal = normal;
 
-    // Per shape
+    vNormal = normal;
 }
