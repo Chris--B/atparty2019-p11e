@@ -91,6 +91,9 @@ unsafe extern "system" fn wnd_proc(
     user::DefWindowProcA(h_wnd, msg, w_param, l_param)
 }
 
+#[cfg(feature = "enable_logging")]
+static mut INFO_BUFFER: [u8; 4096] = [0; 4096];
+
 fn check_compilation(
     &gl: &ogl::GlFuncs,
     glsl: u32,
@@ -114,24 +117,23 @@ fn check_compilation(
         if success == 0 {
             println!("failed");
 
-            let mut info_buf: [u8; 512] = mem::zeroed();
             (gl.GetShaderInfoLog)(
                 glsl,
-                info_buf.len() as i32,
+                INFO_BUFFER.len() as i32,
                 ptr::null_mut(),
-                &mut info_buf as *mut _ as *mut i8,
+                &mut INFO_BUFFER as *mut _ as *mut i8,
             );
-            let info_str = core::str::from_utf8(&info_buf).unwrap();
+            let info_str = core::str::from_utf8(&INFO_BUFFER).unwrap();
 
             println!("Full Source:");
             let source = core::str::from_utf8(glsl_source).unwrap_or_default();
             for (lineno, line) in source.split('\n').enumerate() {
                 let lineno = lineno + 1;
-                println!("{:>3}: {}", lineno, line);
+                println!("{:>3}: {}", lineno, line.trim_end());
             }
 
             println!("{}", info_str);
-            abort!();
+            abort!("Failed to compile.");
         } else {
             println!("ok");
         }
@@ -163,17 +165,16 @@ fn check_linkage(&gl: &ogl::GlFuncs, prog: u32, names: &[&str]) {
         if success == 0 {
             println!("failed");
 
-            let mut info_buf: [u8; 512] = mem::zeroed();
             (gl.GetProgramInfoLog)(
                 prog,
-                info_buf.len() as i32,
+                INFO_BUFFER.len() as i32,
                 ptr::null_mut(),
-                &mut info_buf as *mut _ as *mut i8,
+                &mut INFO_BUFFER as *mut _ as *mut i8,
             );
-            let info_str = core::str::from_utf8(&info_buf).unwrap();
+            let info_str = core::str::from_utf8(&INFO_BUFFER).unwrap();
 
             println!("{}", info_str);
-            abort!();
+            abort!("Failed to link");
         } else {
             println!("ok");
         }
