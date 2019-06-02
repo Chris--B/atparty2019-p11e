@@ -209,13 +209,12 @@ fn generate_view_mat(time: f32) -> Mat4 {
     let time = time % EYES.last().unwrap().1;
 
     let mut eye = Point3::new(30., 30., 30.);
-    let t;
     for datum in &EYES {
         let (t0, t1, eye0, eye1) = *datum;
         if t0 <= time && time <= t1 {
             let eye0 = Vec3::from(eye0);
             let eye1 = Vec3::from(eye1);
-            t = (time - t0) / (t1 - t0);
+            let t = (time - t0) / (t1 - t0);
             eye = Point3::from(t * eye0 + (1. - t) * eye1);
             break;
         }
