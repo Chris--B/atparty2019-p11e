@@ -62,7 +62,7 @@ const uint t_index[] = {
     0, 1, 2,
     0, 3, 2,
     0, 1, 3,
-    0, 2, 1,
+    1, 2, 3,
 };
 
 /// ==== Shape Data
@@ -355,13 +355,26 @@ vec3 rotate_vector(vec3 v, vec4 r) {
     return qmul(r, qmul(vec4(v, 0), r_c)).xyz;
 }
 
+bool is_cube() {
+    return (gl_VertexID / c_index.length()) % 3 == 0;
+}
+
 void main() {
-    const uint VERTS_PER_SHAPE = c_index.length();
-    const uint index           = c_index[gl_VertexID % VERTS_PER_SHAPE];
-    uint shape_id              = gl_VertexID / VERTS_PER_SHAPE;
+    uint VERTS_PER_SHAPE = c_index.length();
+    uint shape_id = gl_VertexID / VERTS_PER_SHAPE;
+
+    uint index;
+    if (is_cube()) {
+        index    = c_index[gl_VertexID % VERTS_PER_SHAPE];
+    } else {
+        index    = t_index[gl_VertexID % VERTS_PER_SHAPE];
+    }
 
     vec3  offset = 4. * shape_offets[shape_id];
     vec3  scale  = shape_scales[shape_id];
+    if (!is_cube()) {
+        scale *= sqrt(2);
+    }
     vec4  rot    = make_rot(vec3(1., 1., 0.), shape_rots[shape_id]);
 
     const mat4 model_offset = mat4(
@@ -382,13 +395,24 @@ void main() {
 
     // Per vertex, regardless of shape
     vRot = rot;
-    vec4 pos = vec4(rotate_vector(c_pos[index], rot), 1.);
+
+    vec3 v_pos;
+    if (is_cube()) {
+        v_pos = c_pos[index];
+    } else {
+        v_pos = t_pos[index];
+    }
+    vec4 pos = vec4(rotate_vector(v_pos, rot), 1.);
     gl_Position = uProjView * model * pos;
     vWorldPos = (model * pos).xyz;
 
     // Per face - each face is defined with 4 index values, 6 faces makes a shape
     vec3 normal = vec3(1., 0., 1.);
-    CALC_NORMAL(normal, gl_VertexID, c_pos, c_index);
+    if (is_cube()) {
+        CALC_NORMAL(normal, gl_VertexID, c_pos, c_index);
+    } else {
+        CALC_NORMAL(normal, gl_VertexID, t_pos, t_index);
+    }
     normal = normalize(normal);
     if (shape_id == 0) {
         normal = -normal;

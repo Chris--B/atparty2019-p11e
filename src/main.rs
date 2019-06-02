@@ -55,6 +55,7 @@ type Mat4 = nalgebra::Matrix4<f32>;
 type Point3 = nalgebra::Point3<f32>;
 type Vec3 = nalgebra::Vector3<f32>;
 
+const FOV: f32 = 100.;
 static PENDING_RESIZE: AtomicI32 = AtomicI32::new(-1);
 static PAUSED: AtomicBool = AtomicBool::new(false);
 
@@ -294,6 +295,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         let pixel_desc = gdi::PIXELFORMATDESCRIPTOR {
             dwFlags: gdi::PFD_SUPPORT_OPENGL | gdi::PFD_DOUBLEBUFFER,
             iPixelType: gdi::PFD_TYPE_RGBA,
+            cDepthBits: 32,
 
             ..mem::zeroed()
         };
@@ -425,7 +427,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
 
     let mut proj = Mat4::new_perspective(
         1.0,  // aspect ratio
-        90.,  // fovy
+        FOV,  // fovy
         0.1,  // znear
         100., // zfar
     );
@@ -485,7 +487,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
 
                 proj = Mat4::new_perspective(
                     width as f32 / height as f32, // aspect ratio
-                    90.,                          // fovy
+                    FOV,                          // fovy
                     0.1,                          // znear
                     100.,                         // zfar
                 );

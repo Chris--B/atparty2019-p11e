@@ -87,6 +87,5 @@ int ogl_load(GlFuncs* pFns)
     ((PFNGLENABLEPROC)GetProcAddress(hOpenGL, "glEnable"))(GL_DEPTH_TEST);
     ((PFNGLDEPTHFUNCPROC)GetProcAddress(hOpenGL, "glDepthFunc"))(GL_LESS);
 
-
     return error;
 }
