@@ -2,6 +2,14 @@
 #include "ogl.h"
 #include <Windows.h>
 
+// Use a dGPU on hybrid systems
+
+// http://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
+__declspec(dllexport) DWORD NvOptimusEnablement                  = 0x00000001;
+
+// http://developer.amd.com/community/blog/2015/10/02/amd-enduro-system-for-developers/
+__declspec(dllexport) int   AmdPowerXpressRequestHighPerformance = 1;
+
 typedef void (*PFN)(void);
 
 // Either:
