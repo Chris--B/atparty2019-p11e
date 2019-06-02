@@ -321,6 +321,28 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
     let gl = gl;
     println!("{:#?}", gl);
 
+    // Print driver information - this is helpful for debugging since we don't
+    // work on Intel.
+    unsafe {
+        println!(
+            "GL VERSION      {}",
+            debug::ptr_to_str((gl.GetString)(ogl::GL_VERSION))
+        );
+        println!(
+            "GL GLSL_VERSION {}",
+            debug::ptr_to_str((gl.GetString)(ogl::GL_SHADING_LANGUAGE_VERSION))
+        );
+        println!(
+            "GL VENDOR       {}",
+            debug::ptr_to_str((gl.GetString)(ogl::GL_VENDOR))
+        );
+        println!(
+            "GL RENDERER     {}",
+            debug::ptr_to_str((gl.GetString)(ogl::GL_RENDERER))
+        );
+        println!("");
+    }
+
     // Setup render state
     unsafe {
         (gl.ClearColor)(0., 0., 0., 0.);

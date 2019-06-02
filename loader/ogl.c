@@ -73,18 +73,20 @@ int ogl_load(GlFuncs* pFns)
     // Drawing Geometry
     pFns->DrawArrays = (PFNGLDRAWARRAYSPROC)        load_fn(hOpenGL, &error, "glDrawArrays");
 
-    // Debug Only
+    // Debug dev builds only
     #if P11E_DEVBUILD
         pFns->GetShaderiv       = (PFNGLGETSHADERIVPROC)        load_fn(hOpenGL, &error, "glGetShaderiv");
         pFns->GetShaderInfoLog  = (PFNGLGETSHADERINFOLOGPROC)   load_fn(hOpenGL, &error, "glGetShaderInfoLog");
         pFns->GetProgramiv      = (PFNGLGETPROGRAMIVPROC)       load_fn(hOpenGL, &error, "glGetProgramiv");
         pFns->GetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)  load_fn(hOpenGL, &error, "glGetProgramInfoLog");
         pFns->Viewport          = (PFNGLVIEWPORTPROC)           load_fn(hOpenGL, &error, "glViewport");
+        pFns->GetString         = (PFNGLGETSTRINGPROC)          load_fn(hOpenGL, &error, "glGetString");
     #endif
 
     // lol yolo
     ((PFNGLENABLEPROC)GetProcAddress(hOpenGL, "glEnable"))(GL_DEPTH_TEST);
     ((PFNGLDEPTHFUNCPROC)GetProcAddress(hOpenGL, "glDepthFunc"))(GL_LESS);
+
 
     return error;
 }

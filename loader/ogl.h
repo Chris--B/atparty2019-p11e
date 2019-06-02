@@ -54,6 +54,7 @@ typedef struct GlFuncs {
         PFNGLGETPROGRAMIVPROC       GetProgramiv;
         PFNGLGETPROGRAMINFOLOGPROC  GetProgramInfoLog;
         PFNGLVIEWPORTPROC           Viewport;
+        PFNGLGETSTRINGPROC          GetString;
     #endif
 } GlFuncs;
 
