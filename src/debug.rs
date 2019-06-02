@@ -15,7 +15,8 @@ pub struct DebugWriter;
 /// !!! BE DAMN SURE IT DOES. THIS WILL CRASH SAFE CODE IF YOU'RE WRONG. !!!
 pub unsafe fn ptr_to_str(p_bytes: *const u8) -> &'static str {
     let p_bytes_i8 = p_bytes as *const i8;
-    let bytes: &[u8] = core::slice::from_raw_parts(p_bytes, libc::strlen(p_bytes_i8));
+    let bytes: &[u8] =
+        core::slice::from_raw_parts(p_bytes, libc::strlen(p_bytes_i8));
 
     // See: https://doc.rust-lang.org/src/core/str/mod.rs.html#411-413
     &*(bytes as *const [u8] as *const str)

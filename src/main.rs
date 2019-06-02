@@ -325,7 +325,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
     // Print driver information
     // This is really helpful for debugging since we don't work on Intel.
     // (Hybrid graphics are hard)
-    #[cfg(feature="dev_build")]
+    #[cfg(feature = "dev_build")]
     unsafe {
         println!(
             "GL VERSION      {}",
