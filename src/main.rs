@@ -377,8 +377,8 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
     unsafe {
         // Load Vertex Shader
 
-        let mut vert_src = include_bytes!("../glsl/sérusier.vert").clone();
-        println!("\"glsl/sérusier.vert\": {} bytes", vert_src.len());
+        let mut vert_src = include_bytes!("../glsl/min.sérusier.vert").clone();
+        println!("\"glsl/min.sérusier.vert\": {} bytes", vert_src.len());
         // Replaces the last newline with a NUL
         vert_src[vert_src.len() - 1] = 0;
         let vert_src = vert_src;
@@ -392,8 +392,8 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         check_compilation(&gl, sérusier_vert, &vert_src, "sérusier.vert");
 
         // Load Fragment Shader
-        let mut frag_src = include_bytes!("../glsl/sérusier.frag").clone();
-        println!("\"glsl/sérusier.frag\": {} bytes", frag_src.len());
+        let mut frag_src = include_bytes!("../glsl/min.sérusier.frag").clone();
+        println!("\"glsl/min.sérusier.frag\": {} bytes", frag_src.len());
         // Replaces the last newline with a NUL
         frag_src[frag_src.len() - 1] = 0;
         let frag_src = frag_src;
