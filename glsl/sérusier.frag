@@ -75,9 +75,6 @@ void main() {
                 world_pos = 10. * -normal;
             }
             vec3 delta = l_pos - world_pos;
-            if (gl_PrimitiveID > 12) {
-                delta.z *= 2; // warp space time
-            }
             float dist = dot(delta, delta);
 
             float a = 1. / (1. + dist);
