@@ -428,10 +428,10 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut ret_code: isize = 0;
 
     let mut proj = Mat4::new_perspective(
-        1.0, // aspect ratio
-        FOV, // fovy
-        0.1, // znear
-        1e3, // zfar
+        1920. / 1080., // aspect ratio
+        FOV,           // fovy
+        0.1,           // znear
+        1e3,           // zfar
     );
 
     let start = get_time();
