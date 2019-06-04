@@ -18,6 +18,7 @@ use core::{
     },
 };
 
+use libm;
 use nalgebra;
 use winapi::um::errhandlingapi::GetLastError;
 use winapi::{
@@ -37,6 +38,9 @@ mod rt;
 // OpenGL Loader
 #[allow(bad_style, dead_code)]
 mod ogl;
+
+// Audio Utility
+mod audio;
 
 /// Contains platform-specific handles for managing a window and OpenGL context
 #[derive(Debug)]
@@ -59,6 +63,8 @@ type Vec3 = nalgebra::Vector3<f32>;
 const FOV: f32 = 45. * 3.14 / 180.;
 static PENDING_RESIZE: AtomicI32 = AtomicI32::new(-1);
 static PAUSED: AtomicBool = AtomicBool::new(false);
+
+static mut WAV_SCRATCH: [u16; 4096 * 4096] = [0; 4096 * 4096];
 
 unsafe extern "system" fn wnd_proc(
     h_wnd: windef::HWND,
@@ -433,6 +439,124 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         0.1,           // znear
         1e3,           // zfar
     );
+
+    // map gm.dls into memory
+    let gm_dls: &[u8];
+    unsafe {
+        use winapi::um::memoryapi;
+        use winapi::um::winnt;
+
+        let h_gmdls = winapi::um::fileapi::CreateFileA(
+            b"C:/Windows/System32/drivers/gm.dls\0".as_ptr() as *const _,
+            winnt::GENERIC_READ,
+            winnt::FILE_SHARE_READ,
+            ptr::null_mut(),
+            winapi::um::fileapi::OPEN_EXISTING,
+            winnt::FILE_ATTRIBUTE_NORMAL,
+            ptr::null_mut(),
+        );
+
+        // stat -c "%s bytes %n" C:/Windows/System32/drivers/gm.dls
+        const GM_DLS_SIZE: usize = 3_440_660;
+
+        let h_mapping = memoryapi::CreateFileMappingW(
+            h_gmdls,
+            ptr::null_mut(),
+            0x02, // PAGE_READONLY
+            (GM_DLS_SIZE >> 32) as u32,
+            (GM_DLS_SIZE & 32) as u32,
+            ptr::null(),
+        );
+
+        let ptr = memoryapi::MapViewOfFile(
+            h_mapping,
+            memoryapi::FILE_MAP_READ,
+            0, // HI DWORD
+            0, // HI DWORD of offset
+            GM_DLS_SIZE,
+        );
+        if ptr == ptr::null_mut() {
+            abort!("Failed to allocate mapped view for gm.dls");
+        }
+        println!("ptr = 0x{:x}", ptr as usize);
+
+        gm_dls = core::slice::from_raw_parts(ptr as *mut _, GM_DLS_SIZE);
+    }
+    println!("gm_dls length = {} bytes", gm_dls.len());
+
+    const MIDDLE_C_FREQ: f32 = 262.6;
+    let wav_data: &'static mut [u16] = unsafe { &mut WAV_SCRATCH[..] };
+    for i in 0..wav_data.len() {
+        use libm::F32Ext;
+        let t: f32 = i as f32 / 44_100.;
+        let tone = match (i / 44_100) % 4 {
+            0 => audio::tone(MIDDLE_C_FREQ, 0., t),
+            1 => audio::tone(MIDDLE_C_FREQ * f32::powf(2., 1. / 3.), 0., t),
+            2 => audio::tone(MIDDLE_C_FREQ * f32::powf(2., 2. / 3.), 0., t),
+            _ => {
+                audio::tone(MIDDLE_C_FREQ, 0., t)
+                    + audio::tone(MIDDLE_C_FREQ * f32::powf(2., 1. / 3.), 0., t)
+                    + audio::tone(MIDDLE_C_FREQ * f32::powf(2., 2. / 3.), 0., t)
+            },
+        };
+
+        const SCALE: f32 = (1 << 12) as f32;
+        wav_data[i] = (tone * SCALE) as u16;
+    }
+
+    unsafe {
+        use winapi::shared::mmreg;
+        use winapi::um::mmeapi;
+        use winapi::um::mmsystem;
+
+        println!("Found {} WaveOut device(s)", mmeapi::waveOutGetNumDevs());
+
+        let mut h_wave = mem::zeroed();
+        let mut mm_res;
+
+        let samples_per_sec = 44_100;
+        let bits_per_sample = 16;
+        let block_align = bits_per_sample / 8;
+        let mut format = mmreg::WAVEFORMATEX {
+            wFormatTag:      mmreg::WAVE_FORMAT_PCM,
+            nChannels:       1,
+            nSamplesPerSec:  samples_per_sec,
+            nAvgBytesPerSec: samples_per_sec * block_align,
+            nBlockAlign:     block_align as u16,
+            wBitsPerSample:  bits_per_sample as u16,
+            cbSize:          0,
+        };
+
+        mm_res = mmeapi::waveOutOpen(
+            &mut h_wave,
+            mmsystem::WAVE_MAPPER,
+            &mut format,
+            0,
+            0,
+            mmsystem::CALLBACK_NULL,
+        );
+        println!("mm_res = 0x{}", mm_res);
+        println!("h_wave = 0x{:x}", h_wave as usize);
+
+        let mut header = mmsystem::WAVEHDR {
+            dwBufferLength: wav_data.len() as u32,
+            lpData: wav_data.as_ptr() as *mut _,
+            ..mem::zeroed()
+        };
+        mm_res = mmeapi::waveOutPrepareHeader(
+            h_wave,
+            &mut header,
+            mem::size_of_val(&header) as u32,
+        );
+        println!("mm_res = 0x{}", mm_res);
+
+        mm_res = mmeapi::waveOutWrite(
+            h_wave,
+            &mut header,
+            mem::size_of_val(&header) as u32,
+        );
+        println!("mm_res = 0x{}", mm_res);
+    }
 
     let start = get_time();
     println!("start time = {}", start);

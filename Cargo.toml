@@ -20,6 +20,7 @@ enable_logging = []
 #
 [dependencies]
 libc = "0.2.54"
+libm = "0.1"
 cfg-if = "0.1"
 
 [dependencies.nalgebra]
@@ -32,10 +33,12 @@ features = [
     "debugapi",
     "errhandlingapi",
     "libloaderapi",
-    "profileapi",
-    "timeapi",
+    "mmeapi",
     "wingdi",
     "winuser",
+    "fileapi",
+    "mmreg",
+    "memoryapi",
 ]
 
 [build-dependencies]
