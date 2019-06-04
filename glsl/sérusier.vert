@@ -52,17 +52,17 @@ const uint c_index[36] = {
 
 /// https://en.wikipedia.org/wiki/Tetrahedron
 const vec3 t_pos[4] = {
-    vec3(-1.,  0., -1. / 1.41421356237),
-    vec3( 1.,  0., -1. / 1.41421356237),
-    vec3( 0., -1.,  1. / 1.41421356237),
-    vec3( 0.,  1.,  1. / 1.41421356237),
+    vec3( 1,  1,  1), // A
+    vec3( 1, -1, -1), // B
+    vec3(-1,  1, -1), // C
+    vec3(-1, -1,  1), // D
 };
 
 const uint t_index[12] = {
-    0, 1, 2,
-    0, 3, 2,
-    0, 1, 3,
-    1, 2, 3,
+    0, 2, 1,
+    0, 2, 3,
+    0, 3, 1,
+    1, 3, 2,
 };
 
 /// ==== Shape Data
@@ -372,9 +372,6 @@ void main() {
 
     vec3 offset = 4. * shape_offets[shape_id];
     vec3 scale  = shape_scales[shape_id];
-    if (!is_cube()) {
-        scale *= sqrt(2);
-    }
     vec4 rot = make_rot(vec3(1., 1., 0.), shape_rots[shape_id]);
 
     const mat4 model_offset = mat4(
