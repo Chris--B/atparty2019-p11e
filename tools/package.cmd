@@ -12,15 +12,19 @@ for /f "delims=/ tokens=1-3" %%a in ("%DATE:~4%") do (
 @mkdir dist
 @mkdir %DIST_DIR%
 
+@rm -v %CARGO_TARGET_DIR%/x86_64-pc-windows-msvc/release/p11e.exe
 cargo build --target=x86_64-pc-windows-msvc --release
 @cp -v %CARGO_TARGET_DIR%/x86_64-pc-windows-msvc/release/p11e.exe  %DIST_DIR%/p11e-error-x64.exe
 
+@rm -v %CARGO_TARGET_DIR%/i686-pc-windows-msvc/release/p11e.exe
 cargo build --target=i686-pc-windows-msvc   --release
 @cp -v %CARGO_TARGET_DIR%/i686-pc-windows-msvc/release/p11e.exe    %DIST_DIR%/p11e-error-x86.exe
 
+@rm -v %CARGO_TARGET_DIR%/x86_64-pc-windows-msvc/release/p11e.exe
 cargo build --target=x86_64-pc-windows-msvc --release --no-default-features
 @cp -v %CARGO_TARGET_DIR%/x86_64-pc-windows-msvc/release/p11e.exe  %DIST_DIR%/p11e-quiet-x64.exe
 
+@rm -v %CARGO_TARGET_DIR%/i686-pc-windows-msvc/release/p11e.exe
 cargo build --target=i686-pc-windows-msvc   --release --no-default-features
 @cp -v %CARGO_TARGET_DIR%/i686-pc-windows-msvc/release/p11e.exe    %DIST_DIR%/p11e-quiet-x86.exe
 
