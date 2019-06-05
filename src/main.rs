@@ -64,7 +64,8 @@ const FOV: f32 = 45. * 3.14 / 180.;
 static PENDING_RESIZE: AtomicI32 = AtomicI32::new(-1);
 static PAUSED: AtomicBool = AtomicBool::new(false);
 
-static mut WAV_SCRATCH: [u16; 4096 * 4096] = [0; 4096 * 4096];
+use audio::AUDIO_HZ;
+static mut WAV_SCRATCH: [u16; 90 * AUDIO_HZ] = [0; 90 * AUDIO_HZ];
 
 unsafe extern "system" fn wnd_proc(
     h_wnd: windef::HWND,
@@ -486,23 +487,8 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
 
     const MIDDLE_C_FREQ: f32 = 262.6;
     let wav_data: &'static mut [u16] = unsafe { &mut WAV_SCRATCH[..] };
-    for i in 0..wav_data.len() {
-        use libm::F32Ext;
-        let t: f32 = i as f32 / 44_100.;
-        let tone = match (i / 44_100) % 4 {
-            0 => audio::tone(MIDDLE_C_FREQ, 0., t),
-            1 => audio::tone(MIDDLE_C_FREQ * f32::powf(2., 1. / 3.), 0., t),
-            2 => audio::tone(MIDDLE_C_FREQ * f32::powf(2., 2. / 3.), 0., t),
-            _ => {
-                audio::tone(MIDDLE_C_FREQ, 0., t)
-                    + audio::tone(MIDDLE_C_FREQ * f32::powf(2., 1. / 3.), 0., t)
-                    + audio::tone(MIDDLE_C_FREQ * f32::powf(2., 2. / 3.), 0., t)
-            },
-        };
-
-        const SCALE: f32 = (1 << 12) as f32;
-        wav_data[i] = (tone * SCALE) as u16;
-    }
+    audio::write_song(wav_data);
+    println!("x");
 
     unsafe {
         use winapi::shared::mmreg;
@@ -514,9 +500,9 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         let mut h_wave = mem::zeroed();
         let mut mm_res;
 
-        let samples_per_sec = 44_100;
-        let bits_per_sample = 16;
-        let block_align = bits_per_sample / 8;
+        let samples_per_sec: u32 = AUDIO_HZ as u32;
+        let bits_per_sample: u32 = 16;
+        let block_align: u32 = bits_per_sample / 8;
         let mut format = mmreg::WAVEFORMATEX {
             wFormatTag:      mmreg::WAVE_FORMAT_PCM,
             nChannels:       1,
