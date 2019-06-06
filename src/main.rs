@@ -18,7 +18,6 @@ use core::{
     },
 };
 
-use libm;
 use nalgebra;
 use winapi::um::errhandlingapi::GetLastError;
 use winapi::{
@@ -30,6 +29,7 @@ use winapi::{
 
 // This gets us the println!() macro, so it must be declared first.
 #[macro_use]
+#[allow(dead_code)]
 mod debug;
 
 // Rust runtime defines
@@ -39,6 +39,7 @@ mod rt;
 #[allow(bad_style, dead_code)]
 mod ogl;
 
+#[allow(dead_code)]
 // Audio Utility
 mod audio;
 
@@ -438,6 +439,8 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut keep_running: bool = true;
     let mut ret_code: isize = 0;
 
+    // Needed in debug builds
+    #[allow(unused_mut)]
     let mut proj = Mat4::new_perspective(
         1920. / 1080., // aspect ratio
         FOV,           // fovy
@@ -490,7 +493,6 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
     }
     println!("gm_dls length = {} bytes", gm_dls.len());
 
-    const MIDDLE_C_FREQ: f32 = 262.6;
     let wav_data: &'static mut [u16] = unsafe { &mut WAV_SCRATCH[..] };
     // audio::write_song(wav_data);
 

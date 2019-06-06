@@ -1,4 +1,5 @@
-use libm::F32Ext;
+// use libm::F32Ext;
+use libm;
 
 // pub const AUDIO_HZ: usize = 44_100;
 pub const AUDIO_HZ: usize = 11_025;
@@ -12,7 +13,7 @@ pub fn tone(freq: f32, decay: f32, t: f32) -> f32 {
         // k = np.log(2) / decay
         // y *= np.exp(-k*t)
     }
-    return y;
+    y
 }
 
 // # Scale signal to 16-bit integers,
@@ -43,7 +44,6 @@ pub fn write_song(wav_data: &mut [u16]) {
             6 => tone(G4, 0., t) + tone(A3, 0., t),
             _ => {
                 abort!("math is wrong");
-                0.
             },
         };
 
