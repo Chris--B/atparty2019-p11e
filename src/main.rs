@@ -65,7 +65,7 @@ static PENDING_RESIZE: AtomicI32 = AtomicI32::new(-1);
 static PAUSED: AtomicBool = AtomicBool::new(false);
 
 use audio::AUDIO_HZ;
-static mut WAV_SCRATCH: [u16; 90 * AUDIO_HZ] = [0; 90 * AUDIO_HZ];
+static mut WAV_SCRATCH: [u16; 9000 * AUDIO_HZ] = [0; 9000 * AUDIO_HZ];
 
 unsafe extern "system" fn wnd_proc(
     h_wnd: windef::HWND,
@@ -73,6 +73,7 @@ unsafe extern "system" fn wnd_proc(
     w_param: usize,
     l_param: isize,
 ) -> isize {
+    const VK_T: i32 = b't' as _;
     match msg {
         user::WM_SIZE => {
             // println!("WM_Size: {} x {}", width, height);
@@ -87,6 +88,9 @@ unsafe extern "system" fn wnd_proc(
                 },
                 user::VK_SPACE => {
                     PAUSED.fetch_xor(true, Ordering::SeqCst);
+                },
+                VK_T => {
+                    println!("time = {}", get_time());
                 },
                 _ => {},
             }
@@ -442,7 +446,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
     );
 
     // map gm.dls into memory
-    let gm_dls: &[u8];
+    let gm_dls: &[u16];
     unsafe {
         use winapi::um::memoryapi;
         use winapi::um::winnt;
@@ -481,13 +485,40 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         }
         println!("ptr = 0x{:x}", ptr as usize);
 
-        gm_dls = core::slice::from_raw_parts(ptr as *mut _, GM_DLS_SIZE);
+        gm_dls = core::slice::from_raw_parts(ptr as *mut _, GM_DLS_SIZE / 2);
     }
     println!("gm_dls length = {} bytes", gm_dls.len());
 
     const MIDDLE_C_FREQ: f32 = 262.6;
     let wav_data: &'static mut [u16] = unsafe { &mut WAV_SCRATCH[..] };
-    audio::write_song(wav_data);
+    // audio::write_song(wav_data);
+
+    // Birds - play at 1/5 rate to sound like owls
+    let birds_start = 251_000;
+    let birds_end = 254_750;
+    println!("birds {}, {}", birds_start, birds_end);
+
+    // Two and a half notes on a Bass
+    let bass_start = 185_000;
+    let bass_end = 202_650;
+    println!("bass {}, {}", bass_start, bass_end);
+
+    // A nice technoy "bwah" sound, ish.
+    // This needs to be cut before its good
+    let bwah_ish_start = 1_102_500;
+    let bwah_ish_end = 1_195_700;
+    println!("bwah_ish {}, {}", bwah_ish_start, bwah_ish_end);
+
+    let sample_start = bwah_ish_start;
+    let sample_end = bwah_ish_end;
+
+    let src = &gm_dls[sample_start..sample_end];
+    let len = src.len();
+    for i in 0..1 {
+        let x = 2 * i;
+        wav_data[x * len..(x * len + len)].clone_from_slice(src);
+    }
+
     println!("x");
 
     unsafe {
@@ -500,7 +531,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         let mut h_wave = mem::zeroed();
         let mut mm_res;
 
-        let samples_per_sec: u32 = AUDIO_HZ as u32;
+        let samples_per_sec: u32 = AUDIO_HZ as u32 * 3 / 4;
         let bits_per_sample: u32 = 16;
         let block_align: u32 = bits_per_sample / 8;
         let mut format = mmreg::WAVEFORMATEX {

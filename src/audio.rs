@@ -1,6 +1,7 @@
 use libm::F32Ext;
 
-pub const AUDIO_HZ: usize = 44_100;
+// pub const AUDIO_HZ: usize = 44_100;
+pub const AUDIO_HZ: usize = 11_025;
 
 // Thank you John Cook
 //      https://www.johndcook.com/blog/2017/05/31/listening-to-golden-angles
