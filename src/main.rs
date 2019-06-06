@@ -468,7 +468,8 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
             h_gmdls,
             ptr::null_mut(),
             0x02, // PAGE_READONLY
-            (GM_DLS_SIZE >> 32) as u32,
+            // (GM_DLS_SIZE >> 32) as u32,
+            0,
             (GM_DLS_SIZE & 32) as u32,
             ptr::null(),
         );
