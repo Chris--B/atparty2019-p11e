@@ -24,7 +24,7 @@ vec3 rotate_vector(vec3 v, vec4 r) {
 
 vec2 circle_5(int fifth) {
     float t = uTime - fifth * (2.*PI) /5;
-    return 10. * vec2(sin(t), cos(t));
+    return 17. * vec2(sin(t), cos(t));
 }
 
 vec3 rgb(int r, int g, int b) {

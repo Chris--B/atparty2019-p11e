@@ -1,6 +1,9 @@
 #version 460
 
-const float PI = 3.1415926535897932384626433832795;
+const float PI  = 3.1415926535897932384626433832795;
+const float D2R = PI / 180.0;
+
+#define CIRCLE2(t, r) ((r) * vec2(cos(D2R * (t)), sin(D2R * (t))))
 
 /// ==== Vertex Data
 const vec3 c_pos[24] = {
@@ -65,8 +68,107 @@ const uint t_index[12] = {
     1, 3, 2,
 };
 
-/// ==== Shape Data
-const vec3 shape_offets[65] = {
+/// ==== Shape Data - Scene 0 Chosen One
+const vec3 shape_offsets_0[] = {
+    vec3(0.),
+    vec3(0., 0., 5.),
+#define R 20.0
+    vec3(CIRCLE2( 1 * 360./23., R), 3),
+    vec3(CIRCLE2( 2 * 360./23., R), 3),
+    vec3(CIRCLE2( 3 * 360./23., R), 3),
+    vec3(CIRCLE2( 4 * 360./23., R), 3),
+    vec3(CIRCLE2( 5 * 360./23., R), 3),
+    vec3(CIRCLE2( 6 * 360./23., R), 3),
+    vec3(CIRCLE2( 7 * 360./23., R), 3),
+    vec3(CIRCLE2( 8 * 360./23., R), 3),
+    vec3(CIRCLE2( 9 * 360./23., R), 3),
+    vec3(CIRCLE2(10 * 360./23., R), 3),
+    vec3(CIRCLE2(11 * 360./23., R), 3),
+    vec3(CIRCLE2(12 * 360./23., R), 3),
+    vec3(CIRCLE2(13 * 360./23., R), 3),
+    vec3(CIRCLE2(14 * 360./23., R), 3),
+    vec3(CIRCLE2(15 * 360./23., R), 3),
+    vec3(CIRCLE2(16 * 360./23., R), 3),
+    vec3(CIRCLE2(17 * 360./23., R), 3),
+    vec3(CIRCLE2(18 * 360./23., R), 3),
+    vec3(CIRCLE2(19 * 360./23., R), 3),
+    vec3(CIRCLE2(20 * 360./23., R), 3),
+    vec3(CIRCLE2(21 * 360./23., R), 3),
+    vec3(CIRCLE2(22 * 360./23., R), 3),
+    vec3(CIRCLE2(23 * 360./23., R), 3),
+#undef R
+};
+
+const vec3 shape_scales_0[] = {
+    vec3(30.),
+
+    vec3(10.),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+    vec3(0.3),
+};
+
+const float shape_rots_0[] = {
+    0.,
+    90.,
+
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+    90.,
+};
+
+/// ==== Shape Data - Scene 9 Testing
+const vec3 shape_offsets_9[65] = {
     // Skybox - Don't move it
     vec3( 0.0,  0.0,  0.0),
 
@@ -181,7 +283,7 @@ const vec3 shape_offets[65] = {
     // vec3(0.934725066004673, 0.9692061073213116, 0.6466875450611609),
 };
 
-const vec3 shape_scales[65] = {
+const vec3 shape_scales_9[65] = {
     vec3(30.),
 
     vec3(0.8),
@@ -250,7 +352,7 @@ const vec3 shape_scales[65] = {
     vec3(0.8),
 };
 
-const float shape_rots[65] = {
+const float shape_rots_9[65] = {
     0.,
 
      00.,
@@ -356,7 +458,14 @@ vec3 rotate_vector(vec3 v, vec4 r) {
 }
 
 bool is_cube() {
-    return (gl_VertexID / c_index.length()) % 3 == 0;
+    // scene 9
+    if (0) {
+        return (gl_VertexID / c_index.length()) % 3 == 0;
+    }
+    // scene 0
+    if (1) {
+        return true;
+    }
 }
 
 void main() {
@@ -370,9 +479,9 @@ void main() {
         index    = t_index[gl_VertexID % VERTS_PER_SHAPE];
     }
 
-    vec3 offset = 4. * shape_offets[shape_id];
-    vec3 scale  = shape_scales[shape_id];
-    vec4 rot = make_rot(vec3(1., 1., 0.), shape_rots[shape_id]);
+    vec3 offset = shape_offsets_0[shape_id];
+    vec3 scale  = shape_scales_0[shape_id];
+    vec4 rot = make_rot(vec3(1., 1., 0.), shape_rots_0[shape_id]);
 
     const mat4 model_offset = mat4(
         vec4(1.,  0.,  0.,  0.),

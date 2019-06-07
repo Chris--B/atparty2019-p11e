@@ -39,11 +39,12 @@ mod rt;
 #[allow(bad_style, dead_code)]
 mod ogl;
 
-#[allow(dead_code)]
 // Audio Utility
+#[allow(dead_code)]
 mod audio;
 
 // https://www.nayuki.io/page/free-small-fft-in-multiple-languages
+#[allow(dead_code)]
 mod fft;
 
 /// Contains platform-specific handles for managing a window and OpenGL context
