@@ -19,7 +19,10 @@ fn main() {
                 "0"
             },
         )
+        // Windows: Where defining PI is hard
+        .define("_USE_MATH_DEFINES","")
         .include("loader")
         .file("loader/ogl.c")
+        .file("fft/fft.c")
         .compile("ogl_loader");
 }

@@ -43,6 +43,9 @@ mod ogl;
 // Audio Utility
 mod audio;
 
+// https://www.nayuki.io/page/free-small-fft-in-multiple-languages
+mod fft;
+
 /// Contains platform-specific handles for managing a window and OpenGL context
 #[derive(Debug)]
 struct Window {
