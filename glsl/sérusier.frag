@@ -35,9 +35,9 @@ vec3 color_z2(float z) {
     return vec3(0.9);
 }
 
-vec3 color_z(float z) {
-    // Normalize into [0, 1].
-    float zz = (z + 10.) / 20.;
+vec3 color_z(float zz) {
+    // // Normalize into [0, 1].
+    // float zz = (z + 10.) / 20.;
     vec3 palette[] = {
         rgb(  2,  86, 208), // Dark blue
         rgb(  0, 140,  81), // Blue-green
@@ -56,7 +56,16 @@ vec3 color_z(float z) {
     return mix(palette[i_lo], palette[i_hi], fract(i_f));
 }
 
-void main() {
+vec3 color_0(float z)
+{
+    float t = clamp(0., 1., uTime - 3.);
+    if (uTime < 4.) {
+        t /= 2;
+    }
+    return mix(vec3(1.), color_z(z), t);
+}
+
+void main_scene_9() {
     int  light_cap   = int(15. * uTime);
     int  light_count = 0;
     vec3 diffuse     = vec3(0.);
@@ -83,10 +92,59 @@ void main() {
             vec3 l = normalize(l_pos - world_pos);
             vec3 n = normalize(normal);
             float discord = dot(n, l);
-            diffuse += a * color_z(zz) * max(discord, 0.0);
+            diffuse += a * color_z(zz) * abs(discord);
             light_count += 1;
         }
     }
 
     fragColor = vec4(diffuse, 1.);
+}
+
+// scene 0
+void main() {
+    int  light_cap   = int(30. * uTime);
+    int  light_count = 0;
+    vec3 diffuse     = vec3(0.);
+
+    // r for radius
+    for (float r = 10.; r < 20.; r += 1) {
+        for (float k = 0; k < 1.0; k += 1./12.)
+        {
+            if (light_count > light_cap) {
+                break;
+            }
+            // t for theta
+            // glsl rejects θ
+            float t = 2.0 * PI * k;
+            vec3 l_pos = vec3(r * cos(t), r * sin(t), 3. * sin(r*r) + 3.);
+
+            vec3 world_pos = vWorldPos;
+            vec3 normal = rotate_vector(vNormal, vRot);
+            if (gl_PrimitiveID <= 12) {
+                normal    = -normalize(world_pos);
+                world_pos = 10. * -normal;
+            }
+            vec3 delta = l_pos - world_pos;
+            float dist = dot(delta, delta);
+
+            float a = 1. / (1. + dist);
+            a *= mix(0., 1., clamp(0., 1., (15. * uTime) - light_count));
+
+            vec3 l = normalize(l_pos - world_pos);
+            vec3 n = normalize(normal);
+            float discord = dot(n, l);
+            diffuse += a * color_0(k) * abs(discord);
+            light_count += 1;
+        }
+    }
+
+    // fade out
+    float x = 4 - uTime;
+    if (abs(x) > 0.12) {
+        x = 1.;
+    } else {
+        x = sin(PI/2. * x / 0.12);
+    }
+
+    fragColor = vec4(x * diffuse, 1.);
 }

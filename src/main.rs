@@ -215,17 +215,19 @@ fn get_time() -> f64 {
 
 fn generate_view_mat(time: f32) -> Mat4 {
     // Sorted by [t0, t1] pairs
-    const EYES: [(f32, f32, [f32; 3], [f32; 3]); 2] = [
+    const EYES: &[(f32, f32, [f32; 3], [f32; 3])] = &[
         // t0, t1, eye0, eye1
-        // (0., 2., [-7., -7., -7.], [-7., -7., -2.]),
-        // (2., 4., [-7., 1., 7.], [7., 1., 7.]),
-        (4., 14., [30., -30., 20.], [-30., -30., 20.]),
-        (14., 24., [-30., -30., 20.], [-30., 30., 20.]),
+        (0., 4., [-20., -20., 2.5], [-5., -20., 2.5]),
+        (4., 8., [-30., 30., 5.], [-15., 15., 5.]),
+        /* (0., 2., [-7., -7., -7.], [-7., -7., -2.]),
+         * (2., 4., [-7., 1., 7.], [7., 1., 7.]),
+         * (4., 14., [30., -30., 20.], [-30., -30., 20.]),
+         * (14., 24., [-30., -30., 20.], [-30., 30., 20.]), */
     ];
     let time = time % EYES.last().unwrap().1;
 
     let mut eye = Point3::new(30., 30., 30.);
-    for datum in &EYES {
+    for datum in EYES {
         let (t0, t1, eye0, eye1) = *datum;
         if t0 <= time && time <= t1 {
             let eye0 = Vec3::from(eye0);
@@ -235,7 +237,24 @@ fn generate_view_mat(time: f32) -> Mat4 {
             break;
         }
     }
-    let focus = Point3::new(0., 0., -5.);
+
+    const FOCUS: &[(f32, f32, [f32; 3], [f32; 3])] = &[
+        // t0, t1, focus0, focus1
+        (0., 4., [15., 0., 2.5], [0., 0., 2.5]),
+        (4., 8., [0., 0., 0.], [0., 0., 5.]),
+    ];
+    let mut focus = Point3::new(0., 0., -5.);
+    for datum in FOCUS {
+        let (t0, t1, focus0, focus1) = *datum;
+        if t0 <= time && time <= t1 {
+            let focus0 = Vec3::from(focus0);
+            let focus1 = Vec3::from(focus1);
+            let t = (time - t0) / (t1 - t0);
+            focus = Point3::from(t * focus0 + (1. - t) * focus1);
+            break;
+        }
+    }
+
     Mat4::look_at_rh(&eye, &focus, &Vec3::new(0., 0., 1.))
 }
 

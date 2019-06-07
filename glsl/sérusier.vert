@@ -102,7 +102,7 @@ const vec3 shape_offsets_0[] = {
 const vec3 shape_scales_0[] = {
     vec3(30.),
 
-    vec3(10.),
+    vec3(7.),
     vec3(0.3),
     vec3(0.3),
     vec3(0.3),
@@ -133,38 +133,38 @@ const float shape_rots_0[] = {
     0.,
     90.,
 
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
-    90.,
+    39.8,
+    43.1,
+    33.6,
+    42.0,
+    31.6,
+    47.4,
+    40.7,
+    36.5,
+    44.2,
+    49.9,
+    32.0,
+    41.8,
+    30.7,
+    46.4,
+    49.9,
+    38.8,
+    39.5,
+    43.9,
+    36.1,
+    36.7,
+    39.6,
+    33.0,
+    47.0,
+    44.8,
+    46.6,
+    33.0,
+    34.3,
+    46.2,
+    40.2,
+    42.7,
+    43.3,
+    34.7,
 };
 
 /// ==== Shape Data - Scene 9 Testing
@@ -452,10 +452,16 @@ vec4 qmul(vec4 q1, vec4 q2) {
     );
 }
 
-vec3 rotate_vector(vec3 v, vec4 r) {
+vec3 rotate_v(vec3 v, vec4 r) {
     vec4 r_c = r * vec4(-1, -1, -1, 1);
     return qmul(r, qmul(vec4(v, 0), r_c)).xyz;
 }
+
+vec4 rotate_q(vec4 r0, vec4 r1) {
+    vec4 r0_c = r0 * vec4(-1, -1, -1, 1);
+    return qmul(r1, qmul(r1, r0_c));
+}
+
 
 bool is_cube() {
     // scene 9
@@ -481,7 +487,6 @@ void main() {
 
     vec3 offset = shape_offsets_0[shape_id];
     vec3 scale  = shape_scales_0[shape_id];
-    vec4 rot = make_rot(vec3(1., 1., 0.), shape_rots_0[shape_id]);
 
     const mat4 model_offset = mat4(
         vec4(1.,  0.,  0.,  0.),
@@ -499,7 +504,28 @@ void main() {
 
     const mat4 model = model_offset * model_scale;
 
+    vec4 rot;
+    if (0) {
+        rot = make_rot(vec3(1., 1., 0.), shape_rots_9[shape_id]);
+    } else if (1) {
+        if (shape_id > 1) {
+            // Rotate about the axis pointing towards the center
+            vec4 p4 = (model * vec4(0., 0., 0., 1.));
+            vec3 p = p4.xyz / p4.w;
+            vec3 axis = normalize(p);
+            rot = make_rot(axis, 13. * shape_rots_0[shape_id] * uTime);
+        } else if (shape_id == 1) {
+            rot = make_rot(vec3(1., 1., 0.), shape_rots_0[shape_id]);
+        } else {
+            rot = make_rot(vec3(1., 1., 0.), shape_rots_0[0]);
+        }
+    }
+
     // Per vertex, regardless of shape
+    if (shape_id == 1) {
+        vec4 rot2 = make_rot(vec3(0., 0., 1.), -0.05 * shape_rots_0[shape_id] * uTime);
+        rot = rotate_q(rot, rot2);
+    }
     vRot = rot;
 
     vec3 v_pos;
@@ -508,7 +534,7 @@ void main() {
     } else {
         v_pos = t_pos[index];
     }
-    vec4 pos = vec4(rotate_vector(v_pos, rot), 1.);
+    vec4 pos = vec4(rotate_v(v_pos, rot), 1.);
     gl_Position = uProjView * model * pos;
     vWorldPos = (model * pos).xyz;
 
