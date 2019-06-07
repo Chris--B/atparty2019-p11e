@@ -470,7 +470,7 @@ bool is_cube() {
     }
     // scene 0
     if (1) {
-        return true;
+        return (gl_VertexID / c_index.length()) != 1;
     }
 }
 
