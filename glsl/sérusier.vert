@@ -69,35 +69,6 @@ const uint t_index[12] = {
 };
 
 /// ==== Shape Data - Scene 0 Chosen One
-const vec3 shape_scales_0[] = {
-    vec3(30.),
-    vec3(7),
-
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-    vec3(0.3),
-};
-
 const float shape_rots_0[] = {
     0.,
     90.,
@@ -263,7 +234,15 @@ void scene_0() {
         offset = vec3(0., 0., 5.);
     }
 
-    vec3 scale  = shape_scales_0[shape_id];
+    vec3 scale = vec3(0.3);
+    if (shape_id == 0) {
+        scale = vec3(30.);
+    } else if (shape_id == 1) {
+        scale = vec3(7);
+    } else if (shape_id > 24) {
+        // Pretend it doesn't exist
+        scale = vec3(0.);
+    }
 
     const mat4 model_offset = mat4(
         vec4(1.,  0.,  0.,  0.),
