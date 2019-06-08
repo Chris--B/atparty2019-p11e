@@ -407,8 +407,8 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
     unsafe {
         // Load Vertex Shader
 
-        let mut vert_src = include_bytes!("../glsl/sérusier.vert").clone();
-        println!("\"glsl/sérusier.vert\": {} bytes", vert_src.len());
+        let mut vert_src = include_bytes!("../glsl/min.sérusier.vert").clone();
+        println!("\"glsl/min.sérusier.vert\": {} bytes", vert_src.len());
         // Replaces the last newline with a NUL
         vert_src[vert_src.len() - 1] = 0;
         let vert_src = vert_src;
@@ -419,11 +419,11 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         (gl.ShaderSource)(sérusier_vert, 1, &p_vert_src, ptr::null());
 
         (gl.CompileShader)(sérusier_vert);
-        check_compilation(&gl, sérusier_vert, &vert_src, "sérusier.vert");
+        check_compilation(&gl, sérusier_vert, &vert_src, "min.sérusier.vert");
 
         // Load Fragment Shader
-        let mut frag_src = include_bytes!("../glsl/sérusier.frag").clone();
-        println!("\"glsl/sérusier.frag\": {} bytes", frag_src.len());
+        let mut frag_src = include_bytes!("../glsl/min.sérusier.frag").clone();
+        println!("\"glsl/min.sérusier.frag\": {} bytes", frag_src.len());
         // Replaces the last newline with a NUL
         frag_src[frag_src.len() - 1] = 0;
         let frag_src = frag_src;
@@ -434,7 +434,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         (gl.ShaderSource)(sérusier_frag, 1, &p_frag_src, ptr::null());
 
         (gl.CompileShader)(sérusier_frag);
-        check_compilation(&gl, sérusier_frag, &frag_src, "sérusier.frag");
+        check_compilation(&gl, sérusier_frag, &frag_src, "min.sérusier.frag");
 
         // Link everything
         sérusier_prog = (gl.CreateProgram)();
@@ -442,8 +442,8 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         (gl.AttachShader)(sérusier_prog, sérusier_frag);
         (gl.LinkProgram)(sérusier_prog);
         check_linkage(&gl, sérusier_prog, &[
-            "sérusier.vert",
-            "sérusier.frag",
+            "min.sérusier.vert",
+            "min.sérusier.frag",
         ]);
 
         // Logging yay
