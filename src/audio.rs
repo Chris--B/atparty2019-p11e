@@ -1,8 +1,14 @@
 // use libm::F32Ext;
 use libm;
 
-// pub const AUDIO_HZ: usize = 44_100;
-pub const AUDIO_HZ: usize = 11_025;
+use core::mem;
+
+pub const AUDIO_HZ: usize = 44_100;
+// pub const AUDIO_HZ: usize = 11_025;
+
+pub static mut WAV_SCRATCH: [u16; 30 * AUDIO_HZ] = [0; 30 * AUDIO_HZ];
+
+pub static mut HEADER_BUFFER: [u8; 100] = [0; 100];
 
 // Thank you John Cook
 //      https://www.johndcook.com/blog/2017/05/31/listening-to-golden-angles
@@ -35,19 +41,92 @@ pub fn write_song(wav_data: &mut [u16]) {
     for i in 0..wav_data.len() {
         let t: f32 = i as f32 / AUDIO_HZ as f32;
         let tone = match (i / AUDIO_HZ) % 7 {
-            0 => tone(A3, 0., t) + tone(B3, 0., t),
-            1 => tone(B3, 0., t) + tone(C4, 0., t),
-            2 => tone(C4, 0., t) + tone(D4, 0., t),
-            3 => tone(D4, 0., t) + tone(E4, 0., t),
-            4 => tone(E4, 0., t) + tone(F4, 0., t),
-            5 => tone(F4, 0., t) + tone(G4, 0., t),
-            6 => tone(G4, 0., t) + tone(A3, 0., t),
+            0 => tone(A3, 0., t),
+            1 => tone(B3, 0., t),
+            2 => tone(C4, 0., t),
+            3 => tone(D4, 0., t),
+            4 => tone(E4, 0., t),
+            5 => tone(F4, 0., t),
+            6 => tone(G4, 0., t),
             _ => {
                 abort!("math is wrong");
             },
         };
 
         const SCALE: f32 = (1 << 12) as f32;
-        wav_data[i] = (tone * SCALE + 0.5) as u16;
+        wav_data[i] = (tone * SCALE) as u16;
+    }
+}
+
+pub fn play() {
+    unsafe {
+        println!("{} audio samples generating...", WAV_SCRATCH.len());
+        write_song(&mut WAV_SCRATCH);
+        println!("Done!");
+    }
+
+
+    unsafe {
+        use winapi::shared::mmreg;
+        use winapi::um::mmeapi;
+        use winapi::um::mmsystem;
+
+        println!("Found {} WaveOut device(s)", mmeapi::waveOutGetNumDevs());
+
+        let mut h_wave = mem::zeroed();
+        let mut mm_res;
+
+        let samples_per_sec: u32 = AUDIO_HZ as u32 * 3 / 4;
+        let bits_per_sample: u32 = 16;
+        let block_align: u32 = bits_per_sample / 8;
+        let mut format = mmreg::WAVEFORMATEX {
+            wFormatTag:      mmreg::WAVE_FORMAT_PCM,
+            nChannels:       1,
+            nSamplesPerSec:  samples_per_sec,
+            nAvgBytesPerSec: samples_per_sec * block_align,
+            nBlockAlign:     block_align as u16,
+            wBitsPerSample:  bits_per_sample as u16,
+            cbSize:          0,
+        };
+
+        mm_res = mmeapi::waveOutOpen(
+            &mut h_wave,
+            mmsystem::WAVE_MAPPER,
+            &mut format,
+            0,
+            0,
+            mmsystem::CALLBACK_NULL,
+        );
+        println!("h_wave = 0x{:x}", h_wave as usize);
+        if mm_res != 0 {
+            println!("mm_res = 0x{}", mm_res);
+        }
+
+        let p_header: *mut mmsystem::WAVEHDR =
+            HEADER_BUFFER.as_mut().as_ptr() as *mut _;
+
+        *p_header = mmsystem::WAVEHDR {
+            dwBufferLength: WAV_SCRATCH.len() as u32,
+            lpData: WAV_SCRATCH.as_ptr() as *mut _,
+            ..mem::zeroed()
+        };
+
+        mm_res = mmeapi::waveOutPrepareHeader(
+            h_wave,
+            p_header,
+            mem::size_of_val(&*p_header) as u32,
+        );
+        if mm_res != 0 {
+            println!("mm_res = 0x{}", mm_res);
+        }
+
+        mm_res = mmeapi::waveOutWrite(
+            h_wave,
+            p_header,
+            mem::size_of_val(&*p_header) as u32,
+        );
+        if mm_res != 0 {
+            println!("mm_res = 0x{}", mm_res);
+        }
     }
 }
