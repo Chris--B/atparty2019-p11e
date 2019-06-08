@@ -69,37 +69,6 @@ const uint t_index[12] = {
 };
 
 /// ==== Shape Data - Scene 0 Chosen One
-const vec3 shape_offsets_0[] = {
-    vec3(0.),
-    vec3(0., 0., 5.),
-
-#define R 20.0
-    vec3(CIRCLE2( 1 * 360./23., R), 3),
-    vec3(CIRCLE2( 2 * 360./23., R), 3),
-    vec3(CIRCLE2( 3 * 360./23., R), 3),
-    vec3(CIRCLE2( 4 * 360./23., R), 3),
-    vec3(CIRCLE2( 5 * 360./23., R), 3),
-    vec3(CIRCLE2( 6 * 360./23., R), 3),
-    vec3(CIRCLE2( 7 * 360./23., R), 3),
-    vec3(CIRCLE2( 8 * 360./23., R), 3),
-    vec3(CIRCLE2( 9 * 360./23., R), 3),
-    vec3(CIRCLE2(10 * 360./23., R), 3),
-    vec3(CIRCLE2(11 * 360./23., R), 3),
-    vec3(CIRCLE2(12 * 360./23., R), 3),
-    vec3(CIRCLE2(13 * 360./23., R), 3),
-    vec3(CIRCLE2(14 * 360./23., R), 3),
-    vec3(CIRCLE2(15 * 360./23., R), 3),
-    vec3(CIRCLE2(16 * 360./23., R), 3),
-    vec3(CIRCLE2(17 * 360./23., R), 3),
-    vec3(CIRCLE2(18 * 360./23., R), 3),
-    vec3(CIRCLE2(19 * 360./23., R), 3),
-    vec3(CIRCLE2(20 * 360./23., R), 3),
-    vec3(CIRCLE2(21 * 360./23., R), 3),
-    vec3(CIRCLE2(22 * 360./23., R), 3),
-    vec3(CIRCLE2(23 * 360./23., R), 3),
-#undef R
-};
-
 const vec3 shape_scales_0[] = {
     vec3(30.),
     vec3(7),
@@ -158,64 +127,6 @@ const float shape_rots_0[] = {
 };
 
 /// ==== Shape Data - Scene 9 Testing
-const vec3 shape_scales_9[] = {
-    // vec3(30.),
-    vec3(0.),
-
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-    vec3(0.8),
-};
-
 const float shape_rots_9[65] = {
     0.,
 
@@ -345,7 +256,13 @@ void scene_0() {
         index = t_index[gl_VertexID % VERTS_PER_SHAPE];
     }
 
-    vec3 offset = shape_offsets_0[shape_id];
+    vec3 offset = vec3(CIRCLE2(20 * uTime  + (shape_id * 360./23.), 20.), 3);
+    if (shape_id == 0) {
+        offset = vec3(0.);
+    } else if (shape_id == 1) {
+        offset = vec3(0., 0., 5.);
+    }
+
     vec3 scale  = shape_scales_0[shape_id];
 
     const mat4 model_offset = mat4(
@@ -425,10 +342,15 @@ void scene_9() {
         uint x = (shape_id % 10) - 5;
         uint y = (shape_id / 10);
         float xx = 4. * x + 2 * (y % 2);
-        float yy = 4. * y - 10.;
+        float yy = 4. * y - 5.;
         offset = vec3(xx, 0., yy);
     }
-    vec3 scale  = shape_scales_9[shape_id]; //reuse
+    vec3 scale;
+    if (shape_id == 0) {
+        scale = vec3(0.);
+    } else {
+        scale = vec3(0.8);
+    }
 
     const mat4 model_offset = mat4(
         vec4(1.,  0.,  0.,  0.),
