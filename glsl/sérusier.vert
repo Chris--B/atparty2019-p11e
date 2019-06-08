@@ -227,7 +227,7 @@ void scene_0() {
         index = t_index[gl_VertexID % VERTS_PER_SHAPE];
     }
 
-    vec3 offset = vec3(CIRCLE2(20 * uTime  + (shape_id * 360./23.), 20.), 3);
+    vec3 offset = vec3(CIRCLE2(5 * uTime  + (shape_id * 360./23.), 20.), 3);
     if (shape_id == 0) {
         offset = vec3(0.);
     } else if (shape_id == 1) {
@@ -379,6 +379,6 @@ void main() {
     if (uTime < 8.) {
         scene_0();
     } else {
-        scene_9();
+        // scene_9();
     }
 }

@@ -148,6 +148,7 @@ void main() {
     if (uTime < 8.) {
         scene_0();
     } else {
-        scene_9();
+        // scene_9();
+        fragColor = vec4(0., 0., 0, 1.);
     }
 }

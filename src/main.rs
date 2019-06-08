@@ -216,7 +216,7 @@ fn generate_view_mat(time: f32) -> Mat4 {
         // t0, t1, eye0, eye1
         (0., 4., [-20., -20., 2.5], [-5., -20., 2.5]),
         (4., 8., [-30., 30., 5.], [-15., 15., 5.]),
-        (8., 16., [-20., -20., 5.], [-20., 20., 5.]),
+        // (8., 16., [-20., -20., 5.], [-20., 20., 5.]),
     ];
     let time = time % EYES.last().unwrap().1;
 
@@ -236,7 +236,7 @@ fn generate_view_mat(time: f32) -> Mat4 {
         // t0, t1, focus0, focus1
         (0., 4., [15., 0., 2.5], [0., 0., 2.5]),
         (4., 8., [0., 0., 0.], [0., 0., 5.]),
-        (8., 16., [0., 0., 0.], [0., 0., 0.]),
+        // (8., 16., [0., 0., 0.], [0., 0., 0.]),
     ];
     let mut focus = Point3::new(0., 0., -5.);
     for datum in FOCUS {
@@ -472,7 +472,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
     println!("start time = {}", start);
     while keep_running {
         let time = (get_time() - start) as f32;
-        if time > 16. {
+        if time > 8. {
             keep_running = false;
         }
 
@@ -539,7 +539,6 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
 
         // Update state
         let view = generate_view_mat(time);
-
 
         unsafe {
             (gl.Clear)(ogl::GL_COLOR_BUFFER_BIT | ogl::GL_DEPTH_BUFFER_BIT);

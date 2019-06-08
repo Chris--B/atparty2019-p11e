@@ -6,7 +6,7 @@ use core::mem;
 pub const AUDIO_HZ: usize = 44_100;
 // pub const AUDIO_HZ: usize = 11_025;
 
-pub static mut WAV_SCRATCH: [i16; 10 * 2 * AUDIO_HZ] = [0; 10 * 2 * AUDIO_HZ];
+pub static mut WAV_SCRATCH: [u16; 90 * AUDIO_HZ] = [0; 90 * AUDIO_HZ];
 
 pub static mut HEADER_BUFFER: [u8; 100] = [0; 100];
 
@@ -36,53 +36,69 @@ pub const D4: f32 = 293.665;
 pub const E4: f32 = 329.628;
 pub const F4: f32 = 349.228;
 pub const G4: f32 = 391.995;
+pub const A4: f32 = 440.000;
 
-pub fn write_song(wav_data: &mut [i16]) {
-    use libm::sinf;
+fn sawtooth(t: f32) -> f32 {
+    t % 1.0
+}
+
+fn f2i(f: f32) -> u16 {
+    (f * (1 << 12) as f32) as u16
+}
+
+pub fn write_song(wav_data: &mut [u16]) {
+    use libm::{
+        cosf,
+        powf,
+        sinf,
+    };
 
     // t in [0, 1]
     fn envelope_sin(t: f32) -> f32 {
         sinf(3.1415 * t)
     }
-    fn envelope_into(t: f32) -> f32 {
-        const INTRO: f32 = 0.05;
-        if t < INTRO {
-            t
-        } else if t > (1. - INTRO) {
-            // point-slope form
-            // ...still pops
-            let e = -1. / INTRO * (t - (1. - INTRO)) + 1.;
-            e.max(0.).min(1.)
-        } else {
-            1.
-        }
-    }
-
-    for t in 0..=100 {
-        println!("t = {}, e = {}", t, envelope_into(t as f32 / 100.));
-    }
 
     let n_samples = wav_data.len() / 2;
     for i in 0..n_samples {
-        let j = 2 * i;
-        let t: f32 = j as f32 / AUDIO_HZ as f32;
-        let tone = match (j / AUDIO_HZ) % 7 {
-            0 => tone(A3, 0., t),
-            1 => tone(B3, 0., t),
-            2 => tone(C4, 0., t),
-            3 => tone(D4, 0., t),
-            4 => tone(E4, 0., t),
-            5 => tone(F4, 0., t),
-            6 => tone(G4, 0., t),
-            _ => {
-                abort!("math is wrong");
-            },
+        let t: f32 = i as f32 / (AUDIO_HZ as f32 * 4. / 3.);
+        let e: f32 = if t < 1. {
+            sinf(0.5 * 3.14159 * (t / 1.))
+        } else if 40. < t && t > 41. {
+            cosf((t - 40.) * 3.14159 / 2.)
+        } else {
+            1.
         };
 
-        const SCALE: f32 = (1 << 15) as f32;
-        let scaled = (envelope_into(t % 1.0) * tone * SCALE) as i16;
-        wav_data[j + 0] = scaled;
-        wav_data[j + 1] = scaled;
+        // Pick voices
+        let mut amp = 0.;
+
+        let octave = powf(2.0, -18. / 12.);
+        const OFFSET: f32 = 0.31415;
+        // Every time
+        amp += 0.5 * sawtooth(octave * C4 * t);
+        amp += 0.5 * sawtooth(octave * E4 * t);
+
+        // Every other
+        if (t as u32) % 2 == 1 {
+            amp += 0.5 * sawtooth(octave * C4 * t + OFFSET);
+            amp += 0.5 * sawtooth(octave * E4 * t + OFFSET);
+        }
+
+        if ((t as u32) % 4 == 3) && (t < 35.) {
+            amp += envelope_sin(t) * (sawtooth(octave / 2. * C4 * t - OFFSET));
+            amp += envelope_sin(t) * (sawtooth(octave / 2. * E4 * t - OFFSET));
+        }
+
+        if t > 35. {
+            if (t as u32) % 4 == 3 {
+                amp +=
+                    envelope_sin(t) * (sawtooth(octave / 2. * C4 * t + OFFSET));
+                amp +=
+                    envelope_sin(t) * (sawtooth(octave / 2. * E4 * t + OFFSET));
+            }
+        }
+
+        wav_data[i] = f2i(e * amp);
     }
 }
 
@@ -103,7 +119,7 @@ pub fn play() {
         let mut h_wave = mem::zeroed();
         let mut mm_res;
 
-        let samples_per_sec: u32 = AUDIO_HZ as u32 * 3 / 4;
+        let samples_per_sec: u32 = AUDIO_HZ as u32;
         let bits_per_sample: u32 = 16;
         let block_align: u32 = bits_per_sample / 8;
         let mut format = mmreg::WAVEFORMATEX {
