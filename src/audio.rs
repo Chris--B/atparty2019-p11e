@@ -6,7 +6,7 @@ use core::mem;
 pub const AUDIO_HZ: usize = 44_100;
 // pub const AUDIO_HZ: usize = 11_025;
 
-pub static mut WAV_SCRATCH: [u16; 30 * AUDIO_HZ] = [0; 30 * AUDIO_HZ];
+pub static mut WAV_SCRATCH: [i16; 10 * 2 * AUDIO_HZ] = [0; 10 * 2 * AUDIO_HZ];
 
 pub static mut HEADER_BUFFER: [u8; 100] = [0; 100];
 
@@ -37,10 +37,36 @@ pub const E4: f32 = 329.628;
 pub const F4: f32 = 349.228;
 pub const G4: f32 = 391.995;
 
-pub fn write_song(wav_data: &mut [u16]) {
-    for i in 0..wav_data.len() {
-        let t: f32 = i as f32 / AUDIO_HZ as f32;
-        let tone = match (i / AUDIO_HZ) % 7 {
+pub fn write_song(wav_data: &mut [i16]) {
+    use libm::sinf;
+
+    // t in [0, 1]
+    fn envelope_sin(t: f32) -> f32 {
+        sinf(3.1415 * t)
+    }
+    fn envelope_into(t: f32) -> f32 {
+        const INTRO: f32 = 0.05;
+        if t < INTRO {
+            t
+        } else if t > (1. - INTRO) {
+            // point-slope form
+            // ...still pops
+            let e = -1. / INTRO * (t - (1. - INTRO)) + 1.;
+            e.max(0.).min(1.)
+        } else {
+            1.
+        }
+    }
+
+    for t in 0..=100 {
+        println!("t = {}, e = {}", t, envelope_into(t as f32 / 100.));
+    }
+
+    let n_samples = wav_data.len() / 2;
+    for i in 0..n_samples {
+        let j = 2 * i;
+        let t: f32 = j as f32 / AUDIO_HZ as f32;
+        let tone = match (j / AUDIO_HZ) % 7 {
             0 => tone(A3, 0., t),
             1 => tone(B3, 0., t),
             2 => tone(C4, 0., t),
@@ -53,8 +79,10 @@ pub fn write_song(wav_data: &mut [u16]) {
             },
         };
 
-        const SCALE: f32 = (1 << 12) as f32;
-        wav_data[i] = (tone * SCALE) as u16;
+        const SCALE: f32 = (1 << 15) as f32;
+        let scaled = (envelope_into(t % 1.0) * tone * SCALE) as i16;
+        wav_data[j + 0] = scaled;
+        wav_data[j + 1] = scaled;
     }
 }
 
@@ -64,7 +92,6 @@ pub fn play() {
         write_song(&mut WAV_SCRATCH);
         println!("Done!");
     }
-
 
     unsafe {
         use winapi::shared::mmreg;
