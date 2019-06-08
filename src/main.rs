@@ -599,7 +599,7 @@ fn demo_main(_argc: isize, _argv: *const *const u8) -> isize {
         println!("mm_res = 0x{}", mm_res);
     }
 
-    let start = get_time() - 7.;
+    let start = get_time() - 7.75;
     println!("start time = {}", start);
     while keep_running {
         let time = (get_time() - start) as f32;

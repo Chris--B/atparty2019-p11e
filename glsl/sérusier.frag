@@ -65,16 +65,33 @@ vec3 color_0(float z)
     return mix(vec3(0.8), color_z(z), t);
 }
 
+vec3 color_9(float z) {
+    return vec3(0.8);
+}
+
 void scene_9() {
     vec3 diffuse = vec3(0.);
 
-    vec3 l_pos = vec3(20.);
-    vec3 l = normalize(l_pos - vWorldPos);
+    for (int x = -5; x < 5; x += 1) {
+        for (int y = -5; y < 5; y += 1) {
+            float xx = 4. * x + 2 * (y % 2) - 1;
+            float yy = 4. * y - 5. - 2;
 
-    vec3 n = normalize(rotate_vector(vNormal, vRot));
-    float discord = dot(n, l);
-    diffuse += abs(discord);
+            vec3 l_pos = vec3(xx, 0., yy);
+            vec3 world_pos = vWorldPos;
+            vec3 normal = rotate_vector(vNormal, vRot);
 
+            vec3 delta = l_pos - world_pos;
+            float dist = dot(delta, delta);
+
+            float a = 2. / (1. + dist*dist);
+
+            vec3 l = normalize(l_pos - world_pos);
+            vec3 n = normalize(normal);
+            float discord = dot(n, l);
+            diffuse += a * color_z((yy + 5) / 10) * abs(discord);
+        }
+    }
 
     fragColor = vec4(diffuse, 1.);
 }

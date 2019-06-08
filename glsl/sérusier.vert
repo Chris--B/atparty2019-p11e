@@ -158,79 +158,9 @@ const float shape_rots_0[] = {
 };
 
 /// ==== Shape Data - Scene 9 Testing
-const vec3 shape_offsets_9[65] = {
-    // Skybox - Don't move it
-    vec3( 0.0,  0.0,  0.0),
-
-    // Everything else - 64 of them
-    4 * vec3(-2, -2, -2),
-    4 * vec3(-2, -2, -1),
-    4 * vec3(-2, -2, 0),
-    4 * vec3(-2, -2, 1),
-    4 * vec3(-2, -1, -2),
-    4 * vec3(-2, -1, -1),
-    4 * vec3(-2, -1, 0),
-    4 * vec3(-2, -1, 1),
-    4 * vec3(-2, 0, -2),
-    4 * vec3(-2, 0, -1),
-    4 * vec3(-2, 0, 0),
-    4 * vec3(-2, 0, 1),
-    4 * vec3(-2, 1, -2),
-    4 * vec3(-2, 1, -1),
-    4 * vec3(-2, 1, 0),
-    4 * vec3(-2, 1, 1),
-    4 * vec3(-1, -2, -2),
-    4 * vec3(-1, -2, -1),
-    4 * vec3(-1, -2, 0),
-    4 * vec3(-1, -2, 1),
-    4 * vec3(-1, -1, -2),
-    4 * vec3(-1, -1, -1),
-    4 * vec3(-1, -1, 0),
-    4 * vec3(-1, -1, 1),
-    4 * vec3(-1, 0, -2),
-    4 * vec3(-1, 0, -1),
-    4 * vec3(-1, 0, 0),
-    4 * vec3(-1, 0, 1),
-    4 * vec3(-1, 1, -2),
-    4 * vec3(-1, 1, -1),
-    4 * vec3(-1, 1, 0),
-    4 * vec3(-1, 1, 1),
-    4 * vec3(0, -2, -2),
-    4 * vec3(0, -2, -1),
-    4 * vec3(0, -2, 0),
-    4 * vec3(0, -2, 1),
-    4 * vec3(0, -1, -2),
-    4 * vec3(0, -1, -1),
-    4 * vec3(0, -1, 0),
-    4 * vec3(0, -1, 1),
-    4 * vec3(0, 0, -2),
-    4 * vec3(0, 0, -1),
-    4 * vec3(0, 0, 0),
-    4 * vec3(0, 0, 1),
-    4 * vec3(0, 1, -2),
-    4 * vec3(0, 1, -1),
-    4 * vec3(0, 1, 0),
-    4 * vec3(0, 1, 1),
-    4 * vec3(1, -2, -2),
-    4 * vec3(1, -2, -1),
-    4 * vec3(1, -2, 0),
-    4 * vec3(1, -2, 1),
-    4 * vec3(1, -1, -2),
-    4 * vec3(1, -1, -1),
-    4 * vec3(1, -1, 0),
-    4 * vec3(1, -1, 1),
-    4 * vec3(1, 0, -2),
-    4 * vec3(1, 0, -1),
-    4 * vec3(1, 0, 0),
-    4 * vec3(1, 0, 1),
-    4 * vec3(1, 1, -2),
-    4 * vec3(1, 1, -1),
-    4 * vec3(1, 1, 0),
-    4 * vec3(1, 1, 1),
-};
-
 const vec3 shape_scales_9[] = {
-    vec3(30.),
+    // vec3(30.),
+    vec3(0.),
 
     vec3(0.8),
     vec3(0.8),
@@ -257,7 +187,33 @@ const vec3 shape_scales_9[] = {
     vec3(0.8),
     vec3(0.8),
     vec3(0.8),
-
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
+    vec3(0.8),
 };
 
 const float shape_rots_9[65] = {
@@ -464,7 +420,14 @@ void scene_9() {
         index = t_index[gl_VertexID % VERTS_PER_SHAPE];
     }
 
-    vec3 offset = shape_offsets_9[shape_id];
+    vec3 offset = vec3(0.);
+    if (shape_id > 0) {
+        uint x = (shape_id % 10) - 5;
+        uint y = (shape_id / 10);
+        float xx = 4. * x + 2 * (y % 2);
+        float yy = 4. * y - 10.;
+        offset = vec3(xx, 0., yy);
+    }
     vec3 scale  = shape_scales_9[shape_id]; //reuse
 
     const mat4 model_offset = mat4(
@@ -483,7 +446,7 @@ void scene_9() {
 
     const mat4 model = model_offset * model_scale;
 
-    vec4 rot = make_rot(vec3(1., 1., 0.), shape_rots_9[shape_id]);
+    vec4 rot = make_rot(vec3(1., 1., 0.), 0. * shape_rots_9[shape_id]);
     vRot = rot;
 
     vec3 v_pos;
