@@ -199,14 +199,21 @@ fn check_linkage(&gl: &ogl::GlFuncs, prog: u32, names: &[&str]) {
 // Get a number vaguely related to time.
 // It currently loops every 50 seconds on my laptop. ish.
 fn get_time() -> f64 {
+    // I took short cuts, so this is needed to make this work.
+    const SCALE: f64 = 2_144_392.0 / 10_000_000.0;
+
     unsafe {
+        let mut freq = mem::zeroed();
+        winapi::um::profileapi::QueryPerformanceFrequency(&mut freq);
+
         let mut counter = mem::zeroed();
         winapi::um::profileapi::QueryPerformanceCounter(&mut counter);
+
         let itime = *counter.QuadPart();
-        const ONE_SEC: i64 = 10_000_000; // ish
-        let seconds = itime / ONE_SEC;
-        let subsecs = itime % ONE_SEC;
-        seconds as f64 + (subsecs as f64 / ONE_SEC as f64)
+        let ifreq = *freq.QuadPart();
+        let seconds = itime / ifreq;
+        let subsecs = itime % ifreq;
+        SCALE * (seconds as f64 + (subsecs as f64 / ifreq as f64))
     }
 }
 
