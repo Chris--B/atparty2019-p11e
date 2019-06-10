@@ -1,9 +1,8 @@
 ## 2019 @Party 64k Intro
 
-This was an entry for @Party's 2019 Intro comp. The final shipped size was 27,136 bytes, reported with:
-```
-stat -c "%-60n -- %s bytes" p11e.exe
-```
+This was an entry for @Party's 2019 Intro comp. The final shipped size was 27,136 bytes.
+
+Binary downloads are available [here](https://github.com/Chris--B/atparty2019-p11e/releases).
 
 It uses OpenGL and was written with both C and Rust (against `rustc 1.36.0-nightly (dec4c5201 2019-05-24)`: may have issues compiling as-is on future versions). See the `Building` second below for details.
 
