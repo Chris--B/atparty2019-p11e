@@ -227,7 +227,7 @@ void scene_0() {
         index = t_index[gl_VertexID % VERTS_PER_SHAPE];
     }
 
-    vec3 offset = vec3(CIRCLE2(5 * uTime  + (shape_id * 360./23.), 20.), 3);
+    vec3 offset = vec3(CIRCLE2(5 * uTime  + (float(shape_id) * 360./23.), 20.), 3);
     if (shape_id == 0) {
         offset = vec3(0.);
     } else if (shape_id == 1) {
@@ -320,8 +320,8 @@ void scene_9() {
     if (shape_id > 0) {
         uint x = (shape_id % 10) - 5;
         uint y = (shape_id / 10);
-        float xx = 4. * x + 2 * (y % 2);
-        float yy = 4. * y - 5.;
+        float xx = 4. * float(x) + 2. * float(y % 2);
+        float yy = 4. * float(y) - 5.;
         offset = vec3(xx, 0., yy);
     }
     vec3 scale;
